@@ -1,0 +1,213 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #7a7676;
+        }
+
+        .arrow-down {
+            margin-top: 2px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #7a7676;
+        }
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+
+
+
+block content
+    div(data-ng-app="myApp",data-ng-controller="pageCtrl")
+        .row
+            .col-md-12
+                section.panel
+                    header.panel-heading.custom-tab.turquoise-tab
+                        ul.topMoreNav.nav.nav-tabs
+                            li
+                                a(href='#') 查看所有订单&nbsp({{num}})
+        //搜索框
+        .row
+            .col-lg-12(style="position: relative ;top:10px;")
+                form
+                    .form-group
+                        //.col-lg-1
+                        //    button.btn.btn-info(onclick='') 导出
+                        .col-lg-3
+                            select#interspaceId.form-control(name="interspaceId",required="")
+                                option(value="#{ordertype.classOrder}") #{ordertype.className}
+                                each x in data
+                                    option(value="#{x.classOrder}") #{x.className}
+                        .col-lg-7
+                            .input-group.m-bot15(style="float:right")
+                                input#searchondate.mydate.form-control(type="text",name='ondate',placeholder="请输入日期开始时间",onFocus="WdatePicker({dateFmt:'yyyy-MM-dd',alwaysUseStartDate:true})",style="margin-right:20px;width:auto")
+
+                                input#searchdate.mydate.form-control(type="text",name='date',placeholder="请输入日期结束时间",onFocus="WdatePicker({dateFmt:'yyyy-MM-dd',alwaysUseStartDate:true})",style="margin-right:20px;width:auto")
+                                button.btn.btn-success(type="button",onclick='download()') 搜索
+                                    i.fa.fa-search
+        .row
+            .panel-body
+                .tab-content
+                    #onShelvesGoods.tab-pane.active
+                        section.panel
+                            .panel-body
+                                section#unseen
+                                    table.table.table-bordered.table-striped.table-condensed
+                                        thead
+                                            tr
+                                                th 用户名
+                                                th 用户电话
+                                                th 订单号
+                                                th 订单价格
+                                                th 地址
+                                                th 预约详情
+                                                th 时间
+                                                th 备注
+                                                th 确认收货
+                                        tbody
+                                            tr(data-ng-repeat="x in items")
+                                                td {{x.address.userName}}
+                                                td {{x.address.phone}}
+                                                td {{x.orderNo}}
+                                                td {{x.orderAmount}}
+                                                td {{x.address.addressinfo}}
+                                                td
+                                                    a(href="#myModal{{$index}}",data-toggle="modal",class="btn btn-warning btn-xs",onclick='sms()') 订单详情
+                                                    .modal.fade(aria-hidden='true', aria-labelledby='myModalLabel', role='dialog', tabindex='-1',id="myModal{{$index}}")
+                                                        .modal-dialog
+                                                            .modal-content
+                                                                .form
+
+                                                                    .modal-header
+                                                                        button.close(aria-hidden='true', data-dismiss='modal', type='button') ×
+                                                                        h4.modal-title 订单详情
+                                                                    .modal-body
+                                                                        //弹出框内容部分
+                                                                    .rejectContent
+                                                                        table.table.table-bordered.table-striped.table-condensed
+                                                                            thead
+                                                                                tr
+                                                                                    th 名称
+                                                                                    th 数量
+                                                                                    th 单价
+                                                                            tbody
+                                                                                    td {{x.orderInfo[0].goodsName}}
+                                                                                    td {{x.orderInfo[0].buyNum}}
+                                                                                    td {{x.orderInfo[0].goodsPrice}}
+
+
+
+                                                                    .modal-footer
+                                                                        //button.btn.btn-default(type='button', data-dismiss='modal') 取消
+                                                                        //button#confirm.btn.btn-warning(type='submit' class="okReject")  确认
+                                                td {{x.time}}
+                                                td {{x.remark}}
+                                                td
+                                                   a(href='/orderadmin/updateorder/{{x._id}}/{{x.subtype}}').btn.btn-success.btn-xs  {{x.status}}
+                                    div
+                                        ul.pagination.pagination-sm
+                                            li
+                                                a(data-ng-click='first()') 首页
+                                            li(data-ng-repeat="page in pagelist" data-ng-class='{active:isactivepage(page)}')
+                                                a(data-ng-click='selectpage(page)') {{page}}
+                                            li
+                                                a(data-ng-click='last()') 尾页
+
+
+
+block myScript
+    script(src='/js/datePicker/WdatePicker.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/myJs/page.js')
+    script(type='text/javascript').
+        var pagesize = !{JSON.stringify(pagesize)};
+        var counturl = !{JSON.stringify(counturl)};
+        var dataurl = !{JSON.stringify(dataurl)};
+        page(counturl, dataurl, pagesize);
+        function searchorder(){
+            var linkPhone = $('#searchaccount').val()
+            window.location.href = '/orderadmin/searchorder/'+linkPhone
+        }
+        $('#interspaceId').change(function(){
+            var type = $('#interspaceId').val();
+            window.location.href = '/orderadmin/typesearch/'+type;
+        })
+        function download(){
+            var type = $('#interspaceId').val();
+            var startdate = $('#searchondate').val();
+            var enddate = $('#searchdate').val();
+            if((startdate == '') || (enddate == '')){
+                $.scojs_message('请选择日期时间');
+            }else{
+                window.location.href = '/orderadmin/searchbydate/'+type+'/'+startdate+'/'+enddate;
+            }
+
+        }

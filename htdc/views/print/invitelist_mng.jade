@@ -1,0 +1,147 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #7a7676;
+        }
+
+        .arrow-down {
+            margin-top: 2px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #7a7676;
+        }
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+
+
+
+block content
+    div(data-ng-app="myApp",data-ng-controller="pageCtrl")
+        .row
+            .col-md-12
+                section.panel
+                    header.panel-heading.custom-tab.turquoise-tab
+                        ul.topMoreNav.nav.nav-tabs
+                            li
+                                a(href='#') 查看所有招聘信息&nbsp({{num}})
+        .row
+            .panel-body
+                .tab-content
+                    #onShelvesGoods.tab-pane.active
+                        section.panel
+                            .panel-body
+                                section#unseen
+                                    table.table.table-bordered.table-striped.table-condensed
+                                        thead
+                                            tr
+                                                th 公司名称
+                                                th 公司简介
+                                                th 招聘职位
+                                                th 职位要求
+                                                th 薪资
+                                                th 公司福利
+                                                th 联系人
+                                                th 联系电话
+                                                th 邮箱
+                                                th 时间
+                                        tbody
+                                            tr(data-ng-repeat="x in items")
+                                                td {{x.businessName}}
+                                                td {{x.businessInfo}}
+                                                td {{x.jobName}}
+                                                td {{x.request}}
+                                                td {{x.salary}}
+                                                td {{x.welfare}}
+                                                td {{x.linkman}}
+                                                td {{x.phone}}
+                                                td {{x.email}}
+                                                td {{x.time}}
+                                    div
+                                        ul.pagination.pagination-sm
+                                            li
+                                                a(data-ng-click='first()') 首页
+                                            li(data-ng-repeat="page in pagelist" data-ng-class='{active:isactivepage(page)}')
+                                                a(data-ng-click='selectpage(page)') {{page}}
+                                            li
+                                                a(data-ng-click='last()') 尾页
+
+
+
+block myScript
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/myJs/page.js')
+    script(type='text/javascript').
+        var pagesize = !{JSON.stringify(pagesize)};
+        var counturl = !{JSON.stringify(counturl)};
+        var dataurl = !{JSON.stringify(dataurl)};
+        page(counturl, dataurl, pagesize);

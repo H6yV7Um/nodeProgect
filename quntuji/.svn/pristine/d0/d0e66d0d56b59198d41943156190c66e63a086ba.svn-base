@@ -1,0 +1,17 @@
+/**
+ * 用户信息表Schema
+ */
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+var UserSchema = new mongoose.Schema({
+	nickName:String,                                //姓名
+	gender:Number,                                  //性别
+	language:String,                                //语言
+	city:String,                                    //城市
+	province:String,                                //省
+	country:String,                                 //国家
+	avatarUrl:String,                               //头像
+	openId:String,                                  //openid
+	vipLevel:Number,                                //会员等级.0普通会员;1银牌会员;2金牌会员;3钻石会员
+});
+mongoose.model('User', UserSchema);

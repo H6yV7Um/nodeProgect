@@ -1,0 +1,207 @@
+var express = require('express');
+var router = express.Router();
+var errors = require("../common/errors");
+var mongoose = require("mongoose");
+var Album = mongoose.model("Album");
+var FlockAlbum = mongoose.model("FlockAlbum");
+var AlbumUser = mongoose.model("AlbumUser");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var Flock = mongoose.model("Flock");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var Photo = mongoose.model("Photo");
+/**
+ * 删除相册
+ * */
+router.post('/deletealbum', function (req, res, next) {
+	var albumId = req.body.albumId;
+	var openId = req.$wxUserInfo.openId;
+	Album.findOne({_id:mongoose.Types.ObjectId(albumId)}, function (err, docs) {
+		if (err){
+			res.status(200).json(errors.error3);
+		}else{
+			if (docs.isLinkAlbum == 0){//是群相册
+				if(openId == docs.creatorOpenId){//是相册创建者
+					next();
+				}else {//不是相册创建者
+					//判断是不是群主
+					FlockAlbum.findOne({albumId:albumId},function (err1, docs1) {
+						if(err){
+							res.status(200).json(errors.error3);
+						} else {
+							Flock.findOne({openGId:docs1.openGId},function (err2, docs2) {
+								if (openId == docs2.creatorOpenId){//是群主
+									next();
+								}else{//不是群主
+									res.status(200).json(errors.error8);
+								}
+							})
+						}
+					});
+				}
+			}else {//是联动相册
+				if(openId == docs.creatorOpenId){//是相册创建者
+					next();
+				}else {//不是相册创建者
+					res.status(200).json(errors.error8);
+				}
+			}
+		}
+	})
+}, function (req, res, next) {
+	var albumId = req.body.albumId;
+	//删除PatchPhoto表中的数据
+	PatchPhoto.remove({albumId:albumId},function () {});
+
+
+	Photo.find({albumId:albumId},function (err,data) {
+		if(err){
+			res.status(200).json(errors.error3);
+		}else {
+				//查看此相册关联的群，刷新群图集缓存
+				FlockAlbum.find({albumId: albumId}, function (err1, data1) {
+					var ids = [];
+					for (var i=0; i<data1.length;i++) {
+						ids.push(data1[i].openGId);
+						functions.buildFlockInfoCache(data1[i].openGId, function () {
+						});
+					}
+					Flock.update({openGId: {$in: ids}}, {$inc: {photoNum: -1}}, function (e, v) {
+					});
+				});
+				//删除FlockAlbum表中的数据,以及AlbumUser表中的数据
+				FlockAlbum.remove({albumId:albumId},function () {});
+				AlbumUser.remove({albumId:albumId},function () {});
+				//删除相册表中的数据
+				AlbumUser.remove({_id:mongoose.Types.ObjectId(albumId)},function () {});
+				//删除Photo表中的数据
+				Photo.remove({albumId:albumId},function () {});
+				//删除万象优图的数据
+				for (var i=0; i<data.length;i++){
+					functions.deletePicFromWxyt(data[i].fileId,function () {});
+				}
+
+		}
+	});
+	res.status(200).json(errors.error0);
+});
+
+/**
+ * 用户预览相册内容
+ */
+router.get("/viewalbum/:albumId",function (req,res,next) {
+	var albumId = req.params.albumId;
+
+	var isMine = 0;      //是否是自己创建的.0不是自己创建的;1是自己创建的
+	var isBlur = 1;      //是否做高斯模糊处理.0不做,1做
+	var page = 1;        //页码.从1开始
+
+	Album.findOne({_id:mongoose.Types.ObjectId(albumId)},function (err, data) {
+		if (err){
+			res.status(200).json(errors.error3);
+		}else{
+			//查看相册内容
+			var start = (parseInt(page) - 1) * 10;
+			PatchPhoto.find({albumId:albumId}).sort({createTime:-1}).skip(start).limit(10).exec(function(err1,docs1){
+				if(err1){
+					res.status(200).json(errors.error3);
+				}else {
+					//判断是否是自己的
+					if (data.creatorOpenId == req.$wxUserInfo.openId){
+						isMine = 1;
+						isBlur = 0;
+					}
+					//判断是否是群相册
+					if (data.isLinkAlbum == 0){
+						isBlur = 0;
+					}
+					//判断相册是否收费
+					if (data.price == 0){
+						isBlur = 0;
+						res.status(200).json({
+							error:0,
+							message:'success',
+							data:{
+								isMine:isMine,
+								isBlur:isBlur,
+								patches:docs1,
+							}
+						});
+					}else{
+						AlbumUser.count({albumId:albumId,userOpenId:req.$wxUserInfo.openId},function (err2,value) {
+							if(err2){
+								res.status(200).json(errors.error3);
+							}else {
+								if(value>0){
+									isBlur = 0;
+								}
+								res.status(200).json({
+									error:0,
+									message:'success',
+									data:{
+										isMine:isMine,
+										isBlur:isBlur,
+										patches:docs1,
+									}
+								});
+							}
+						})
+					}
+				}
+			});
+
+		}
+	});
+});
+
+/**
+ * 用户预览相册更多内容
+ */
+router.get("/viewalbummore/:albumId/:page",function () {
+	var albumId = req.params.albumId;
+	var page = req.params.page;
+
+	//查看相册内容
+	var start = (parseInt(page) - 1) * 10;
+	PatchPhoto.find({albumId:albumId}).sort({createTime:-1}).skip(start).limit(10).exec(function(err1,docs1){
+		if(err1){
+			res.status(200).json(errors.error3);
+		}else {
+			res.status(200).json({
+				error:0,
+				message:'success',
+				data:docs1
+			});
+
+		}
+	});
+});
+
+/**
+ * 修改相册价格
+ */
+router.post("/albumchangeprice",function (req, res,next) {
+	var albumId = req.body.albumId;
+	var price = parseFloat(req.body.albumId);
+
+	Album.findOne({_id:mongoose.Types.ObjectId(albumId)},function (err, data) {
+		if (err) {
+			res.status(200).json(errors.error3);
+		} else {
+			//判断是否是自己的
+			if (data.creatorOpenId == req.$wxUserInfo.openId){
+				Album.update({_id:mongoose.Types.ObjectId(albumId)},{price:price},function (err1, data1) {
+					if (err1) {
+						res.status(200).json(errors.error3);
+					} else {
+						res.status(200).json(errors.error0);
+					}
+				});
+				PatchPhoto.update({albumId:albumId},{price:price},function (err1, data1) {});
+			}else {//非创建者,无修改价格权限
+				res.status(200).json(errors.error8);
+			}
+		}
+	});
+});
+
+module.exports = router;

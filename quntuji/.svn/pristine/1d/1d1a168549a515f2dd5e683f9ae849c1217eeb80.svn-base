@@ -1,0 +1,38 @@
+var express = require('express');
+var router = express.Router();
+var errors = require("../common/errors");
+var mongoose = require("mongoose");
+var Album = mongoose.model("Album");
+var FlockAlbum = mongoose.model("FlockAlbum");
+
+/* 获取相册信息 */
+router.get('/albuminfo', function (req, res, next) {
+
+});
+
+
+/**
+ * 获取个人相册列表(联动相册)
+ * */
+
+
+/*上传照片到相册*/
+
+
+/*删除照片*/
+
+
+/*创建群相册*/
+
+
+/*创建个人相册*/
+
+
+/*删除相册*/
+
+
+/*上传照片到相册*/
+
+
+
+module.exports = router;

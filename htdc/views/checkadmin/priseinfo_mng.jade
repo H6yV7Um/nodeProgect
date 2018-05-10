@@ -1,0 +1,287 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        #showPictureImg {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+        #businessLicensePic {
+            width:300px;
+        }
+        textarea#priseInfo{
+            resize: none;
+            height: 100px;
+        }
+
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="goodsAdd" ng-controller="goodsAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | #{title}
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/check/changeInfo')
+                            input(type="hidden",value="#{data._id}",name="priseid")
+                            .form-group
+                                label.control-label.col-lg-2(for='linkPlace') 公司名称
+                                .col-lg-10
+                                    input#linkPlace.form-control(name='priseName',  type='text', value='#{data.priseName}',required='')
+                            .form-group
+                                label.control-label.col-lg-2 公司logo
+                                .col-lg-10
+                                    .fileupload-new.thumbnail(style='width: 105px; height: 105px; position:relative;padding:0;border:0')
+                                        input#bannerImgInput.default(type='file', value='', style='position:absolute; width:100%; height:100%;z-index:999;background:#ccc;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;cursor:pointer;')
+                                        img#showPictureImg(src="#{data.businessLogo}", alt='')
+
+                            .form-group
+                                label.control-label.col-lg-2(for='linkPlace') 公司业务领域
+                                .col-lg-10
+                                    input#operation.form-control(name='operation',  type='text', value='#{data.operation}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='originatorName') 公司创始人
+                                .col-lg-10
+                                    input#originatorName.form-control(name='originatorName',  type='text', value='#{data.originatorName}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='originatorPhone') 公司创始人手机
+                                .col-lg-10
+                                    input#originatorPhone.form-control(name='originatorPhone',  type='text', value='#{data.originatorPhone}',required='')
+                            .form-group
+                                label.control-label.col-lg-2 公司风采
+                                .col-md-10
+                                    .fileupload.fileupload-new
+                                        .fileupload-new.thumbnail(data-ng-repeat="img in bannerImgs",style='width: 188px; height: 175px; position:relative;')
+                                            span(data-ng-click="removeBannerImg($index)" style="z-index:999999;height:32px;line-height:32px; width:100%;cursor:pointer; text-align:center; font-size:14px;color:#fff;filter:alpha(opacity=0.5);-moz-opacity:0.5;opacity:0.5;position:absolute; bottom:0px;left:0;background:#000;diplay:block;")
+                                                | 删除
+                                            img.bannerImg(src='{{img}}', alt='')
+
+
+                                        .fileupload-new.thumbnail(data-ng-show="bannerImgs.length < 8",style='width: 188px; height: 175px; position:relative;')
+                                            input#mienImgInput.default(type='file',value="",style="position:absolute; width:100%; height:100%;z-index:999;background:#ccc;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;cursor:pointer;")
+                                            img.bannerImg(src='/images/goods_pic_add.png', alt='')
+                                            #progressbar2(style="height:3px;background:green;width:0%;position:absolute; bottom:0;left:0;")
+
+
+                                    input#ImgsHidden.default(type='hidden',value="",name="goodsImgs",ng-update-hidden='', required='')
+                            .form-group
+                                label.control-label.col-lg-2 公司营业执照
+                                .col-lg-10
+                                    .fileupload-new.thumbnail(style='width: 310px; height: 420px; position:relative;padding:0;border:0')
+                                        input#ImgInput.default(type='file', value='', style='position:absolute; width:100%; height:100%;z-index:999;background:#ccc;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;cursor:pointer;')
+                                        img#businessLicensePic(src="#{data.businessLicensePic}", alt='')
+
+                            .form-group
+                                label.control-label.col-lg-2(for='priseInfo') 公司简介
+                                .col-lg-10
+                                    textarea#priseInfo.form-control(name='priseInfo',  type='text',required='') #{data.priseInfo}
+                            input#logo(type="hidden" value="#{data.businessLogo}" name="businessLogo")
+                            input#licensePic(type="hidden" value="#{data.businessLicensePic}" name="businessLicensePic")
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    button#change.btn.btn-primary(type='button',data-ng-click='submitform()') 修改
+
+
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    //script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(type='text/javascript').
+        $('#bannerImgInput').fileupload({
+            dataType: 'json',
+            url: '/1.0/pic/uploadimages',
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 2 * 1024 * 1024,
+            previewMaxWidth: 180,
+            previewMaxHeight: 180,
+            previewCrop: true,
+            done: function (e, data) {
+                var ret = data.result;
+                switch (ret.error) {
+                    case '0':
+                        $("#showPictureImg").attr('src', ret.data)
+                        $("#logo").val( ret.data)
+                        break;
+                    case '6':
+                        $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                        break;
+                    case '7':
+                        $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                        break;
+                }
+            },
+
+            fail: function (e, data) {
+                alert("上传出错了");
+            }
+        })
+
+        $('#ImgInput').fileupload({
+            dataType: 'json',
+            url: '/1.0/pic/uploadimages',
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 2 * 1024 * 1024,
+            previewMaxWidth: 180,
+            previewMaxHeight: 180,
+            previewCrop: true,
+            done: function (e, data) {
+                var ret = data.result;
+                switch (ret.error) {
+                    case '0':
+                        $("#businessLicensePic").attr('src', ret.data)
+                        $("#licensePic").val( ret.data)
+                        break;
+                    case '6':
+                        $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                        break;
+                    case '7':
+                        $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                        break;
+                }
+            },
+
+            fail: function (e, data) {
+                alert("上传出错了");
+            }
+        })
+        var app = angular.module('goodsAdd', []);
+        app.controller('goodsAddCtrl', function ($scope, $http) {
+            var imgs = !{JSON.stringify(data.mien)}
+            $scope.bannerImgs = imgs
+
+
+            //移除banner图片
+            $scope.removeBannerImg = function (index) {
+                imgs.splice(index, 1);
+            };
+            //提交表单
+            $scope.submitform = function () {
+                if (imgs.length > 0) {
+                    $('#ImgsHidden').val(JSON.stringify(imgs))
+                    $('#commentForm').submit();
+                } else {
+                    $.scojs_message('请上传公司风采图片');
+                }
+            }
+            //上传商品图片
+            $('#mienImgInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar2').css(
+                                'width', '100%'
+                            );
+                            setTimeout(function () {
+                                $('#progressbar2').css(
+                                    'width', '0%'
+                                );
+                            }, 1000);
+                            imgs.push(ret.data);
+                            $scope.$apply(function () {
+                                $scope.bannerImgs = imgs;
+                            });
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar2').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            });
+
+        })
+
+
+
+
+

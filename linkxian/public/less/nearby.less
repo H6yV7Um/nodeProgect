@@ -1,0 +1,98 @@
+.nearby-top-cnt{
+  background-image: linear-gradient(-45deg,#559cfd,#97adf8);
+  width: 100%;
+  height: 180px;
+}
+.displace-top-cnt{
+  background-image: linear-gradient(-45deg,#fd7f6c,#f6cb57);
+  width: 100%;
+  height: 180px;
+}
+.input-area{
+  position: relative;
+  bottom:150px;
+  background-color: #fff;
+  width: 95%;
+  margin-left: 2.5%;
+  padding: 20px 0;
+  box-shadow: 0 0 5px #ddd;
+  .input-title{
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .single-input{
+    font-size: 14px;
+    margin: 20px 2.5% 0;
+    border: 1px solid #d7d7d7;
+    padding: 10px 0;
+    label{
+      display: block;
+      span{
+        position: relative;
+        width: 20%;
+        text-align: justify;
+        float: left;
+        padding: 5px 0;
+        margin-left: 5%;
+        height: 20px;
+      }
+      .mustItem:before{
+        content: '＊';
+        position: absolute;
+        font-size: 18px;
+        right: -14px;
+        color: #ff8257;
+        top: 0;
+      }
+      span:after{
+        content: '';
+        display: inline-block;
+        width: 100%;
+      }
+      select{
+        display: inline-block;
+        outline: none;
+        padding: 5px 0;
+        width: 70%;
+        margin-left: 5%;
+        border: none;
+      }
+      input{
+        display: inline-block;
+        outline: none;
+        padding: 5px 0;
+        width: 68%;
+        margin-left: 5%;
+        border: none;
+        height: 21px;
+        position: relative;
+        left: 1%;
+      }
+    }
+  }
+  .form-tip{
+    margin: 5px 2.5%;
+    text-align: left;
+    font-size: 12px;
+    span{
+      color: #fb9077;
+    }
+  }
+  .sub-btn{
+    color: #fff;
+    background-color: #fb9077;
+    border: none;
+    outline: none;
+    margin: 20px 2.5%;
+    display: block;
+    width: 95%;
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px #fb9077;
+  }
+  .sub-btn:active{
+    opacity: 0.7;
+  }
+}

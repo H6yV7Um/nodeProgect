@@ -1,0 +1,437 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    link(rel='stylesheet', type='text/css', href='/js/wangEditor/dist/css/wangEditor.min.css')
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+        .nav a {
+            cursor: pointer
+        }
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+        td.width350 {
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+        input.leftTra {
+            float: left;
+        }
+        .modal-body {
+            overflow: hidden;
+        }
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="addAd" ng-controller="adAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 空间信息
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/interspaceadmin/update')
+                            .form-group
+                                label.control-label.col-lg-2(for='interspaceName') 空间名称
+                                .col-lg-10
+                                    input#interspaceName.form-control(name='interspaceName',  type='text', value='#{data.interspaceName}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='linkemail') 联系人邮箱
+                                .col-lg-10
+                                    input#linkemail.form-control(name='linkemail',  type='text', value='#{data.linkemail}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='url') 空间网址
+                                .col-lg-10
+                                    input#url.form-control(name='url',  type='text', value='#{data.url}')
+                            .form-group
+                                label.control-label.col-lg-2(for='interspaceAddress') 空间地址
+                                .col-lg-10
+                                    input#interspaceAddress.form-control(name='interspaceAddress',  type='text', value='#{data.interspaceAddress}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='linkman') 空间联系人
+                                .col-lg-10
+                                    input#linkman.form-control(name='linkman',  type='text', value='#{data.linkman}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='linkPhone') 联系人电话
+                                .col-lg-10
+                                    input#linkPhone.form-control(name='linkPhone',  type='text', value='#{data.linkPhone}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='interspaceInfo') 空间简介
+                                .col-lg-10
+                                    textarea#interspaceInfo.form-control(name='interspaceInfo',  value='#{data.interspaceInfo}',required='' style="height:100px;resize: vertical;") #{data.interspaceInfo}
+                            .form-group
+                                label.control-label.col-lg-2(for='interspaceInfo') 空间设施
+                                .col-lg-10
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/wifi.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/wifi.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/dayin.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/dayin.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/huiyi.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/huiyi.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/kafei.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/kafei.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/shuba.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/shuba.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/shui.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/shui.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/ting.png" style="width:53px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/ting.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/tingche.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/tingche.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/xiuxi.png" style="width:40px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/xiuxi.png")
+                                    div(style="float:left;margin-right:30px")
+                                        img(src="http://oonn7gtrq.bkt.clouddn.com/zidong.png" style="width:67px;margin-right:10px")
+                                        input.check(type='checkbox' name="spaceCheck" value="http://oonn7gtrq.bkt.clouddn.com/zidong.png")
+                            .form-group
+                                label.control-label.col-lg-2 空间成员
+                                .col-md-10
+                                    .fileupload.fileupload-new
+                                        .addmember(data-ng-show="bannerImgs.length > 0" data-ng-repeat="img in bannerImgs", style="float:left;margin-right:20px")
+                                            .fileupload-new.thumbnail(style='width: 188px; height: 175px; position:relative;')
+                                                span(data-ng-click="removeBannerImg($index)" style="z-index:999999;height:32px;line-height:32px; width:100%;cursor:pointer; text-align:center; font-size:14px;color:#fff;filter:alpha(opacity=0.5);-moz-opacity:0.5;opacity:0.5;position:absolute; bottom:0px;left:0;background:#000;diplay:block;")
+                                                    | 删除
+                                                img.bannerImg(src='{{img.pic}}', alt='')
+                                            .member(data-ng-show="bannerImgs.length > 0" style="width:180px")
+                                                input.membername(type="text" name="name" style="width:100%;margin-top:15px" placeholder="请填写名字" value="{{img.name}}")
+                                                input.memberzhiwei(type="text" name="job" style="width:100%;margin:15px 0" placeholder="请填写职位" value="{{img.job}}")
+
+                                        .fileupload-new.thumbnail(style='width: 188px; height: 175px; position:relative;')
+                                            input#bannerImgInput.default(type='file' value="" style="position:absolute; width:100%; height:100%;z-index:999;background:#ccc;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;cursor:pointer;")
+                                            img.bannerImg(src='/images/goods_pic_add.png', alt='')
+                                            #progressbar2(style="height:3px;background:green;width:0%;position:absolute; bottom:0;left:0;")
+
+
+                                    input#ImgsHidden.default(type='hidden',value="",name="goodsImgs",ng-update-hidden='', required='')
+
+                            .form-group
+                                label.control-label.col-lg-2 空间图片
+                                .col-md-10
+                                    .fileupload.fileupload-new
+                                        .fileupload-new.thumbnail(data-ng-repeat="img in interspaceimages",style='width: 188px; height: 175px; position:relative;')
+                                            span(data-ng-click="removeinterspaceImg($index)" style="z-index:999999;height:32px;line-height:32px; width:100%;cursor:pointer; text-align:center; font-size:14px;color:#fff;filter:alpha(opacity=0.5);-moz-opacity:0.5;opacity:0.5;position:absolute; bottom:0px;left:0;background:#000;diplay:block;")
+                                                | 删除
+                                            img.bannerImg(src='{{img}}', alt='')
+
+
+                                        .fileupload-new.thumbnail(data-ng-show="interspaceimages.length < 4",style='width: 188px; height: 175px; position:relative;')
+                                            input#mienImgInput.default(type='file',value="",style="position:absolute; width:100%; height:100%;z-index:999;background:#ccc;filter:alpha(opacity=0);-moz-opacity:0;opacity:0;cursor:pointer;")
+                                            img.bannerImg(src='/images/goods_pic_add.png', alt='')
+                                            #progressbar1(style="height:3px;background:green;width:0%;position:absolute; bottom:0;left:0;")
+
+
+                                    input#ImgsHidden2.default(type='hidden',value="",name="interspaceimags",ng-update-hidden='', required='')
+
+                            //.form-group
+                            //    label.control-label.col-lg-2 空间详情：
+                            //    .col-lg-10
+                            //     !{data.content}
+
+                            .form-group
+                                label.control-label.col-md-2 空间详情：
+                                .col-md-10
+                                    textarea#tuWenTextArea.form-control(rows='40',name="content",style="resize: none;",minlength=10,maxlength=5000)
+                                            !{data.content}
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+
+                                    input#bannerImgsHidden.default(type='hidden',value="#{data.interspacePic}",name="interspacePic")
+                                    input#goodsid.default(type='hidden',value="#{data._id}",name="interspaceid")
+                                    input#spacesheshi.default(type='hidden',value="#{data.interspaceFacility}",name="interspaceFacility")
+                                    button#submitT.btn.btn-primary(type='submit',data-ng-click="submitform()") 提交
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    //script(src='/js/jquery-1.10.2.min.js')
+    script(type='text/javascript').
+        var spacesheshi=($('#spacesheshi').val()).split(',')
+        spacesheshi.forEach(function (value,index) {
+            $('input:checkbox').each(function () {
+                if($(this).val()==value){
+                    console.log(this)
+                    $(this).attr('checked',"checked")
+                }
+
+            });
+        })
+
+        var app = angular.module('addAd', []);
+        app.controller('adAddCtrl', function ($scope, $http) {
+            var imgs = !{JSON.stringify(data.member)}
+            var interspaceimgs = !{JSON.stringify(data.interspacePic)}
+            //var imgs = []
+            $scope.bannerImgs = imgs
+            $scope.interspaceimages = interspaceimgs
+
+            //移除banner图片
+            $scope.removeBannerImg = function (index) {
+                imgs.splice(index, 1);
+            };
+            //移除空间图片
+            $scope.removeinterspaceImg = function (index) {
+                interspaceimgs.splice(index, 1);
+            };
+            //提交表单
+            $scope.submitform = function () {
+
+                $('#ImgsHidden').val(JSON.stringify(imgs))
+                $('#ImgsHidden2').val(JSON.stringify(interspaceimgs))
+                $('#commentForm').submit();
+            }
+            //上传商品图片
+            $('#bannerImgInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar2').css(
+                                'width', '100%'
+                            );
+                            setTimeout(function () {
+                                $('#progressbar2').css(
+                                    'width', '0%'
+                                );
+                            }, 1000);
+                            imgs.push({
+                                pic:ret.data
+                            });
+
+                            $scope.$apply(function () {
+                                $scope.bannerImgs = imgs;
+                            });
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar2').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            });
+            $('#mienImgInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar1').css(
+                                'width', '100%'
+                            );
+                            setTimeout(function () {
+                                $('#progressbar1').css(
+                                    'width', '0%'
+                                );
+                            }, 1000);
+                            interspaceimgs.push(ret.data);
+
+                            $scope.$apply(function () {
+                                $scope.interspaceimages = interspaceimgs;
+                            });
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar1').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            });
+
+        })
+
+        //mienImgInput
+
+            $("#submitT").click(function () {
+                $('#commentForm').submit();
+            })
+            $('input:checkbox').click(function () {
+                $('input:checkbox').each(function () {
+                    if ($(this).attr('checked') == true) {
+                        console.log($(this).val());
+                    }
+                });
+            })
+
+            $('#showPictureInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar1').css(
+                                'width', '100%'
+                            );
+                            $("#bannerImgsHidden").val(ret.data);
+                            $("#showPictureImg").attr('src',ret.data)
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar1').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            });
+
+            //创建富文本
+            var editor = new wangEditor('tuWenTextArea');
+            // 普通的自定义菜单
+            editor.config.menus = [
+                'source',
+                'bold',
+                'underline',
+                'italic',
+                'strikethrough',
+                'eraser',
+                'forecolor',
+                'bgcolor',
+                'quote',
+                'fontfamily',
+                'fontsize',
+                'head',
+                'unorderlist',
+                'orderlist',
+                'alignleft',
+                'aligncenter',
+                'alignright',
+                'link',
+                'unlink',
+                'table',
+                'emotion',
+                'img',
+                'video',
+                'insertcode',
+                'undo',
+                'redo',
+                'fullscreen'
+            ];
+
+            editor.config.uploadImgFns.onload = function (url, xhr) {
+                // resultText 服务器端返回的text
+                // xhr 是 xmlHttpRequest 对象，IE8、9中不支持
+
+                // 上传图片时，已经将图片的名字存在 editor.uploadImgOriginalName
+                var originalName = editor.uploadImgOriginalName || '';
+
+                // 如果 resultText 是图片的url地址，可以这样插入图片：
+                editor.command(null, 'insertHtml', '<img src="' + url + '" alt="' + originalName + '" style="max-width:100%;"/>');
+                // 如果不想要 img 的 max-width 样式，也可以这样插入：
+                // editor.command(null, 'InsertImage', resultText);
+            };
+            // 上传图片（举例）
+            editor.config.uploadImgUrl = '/1.0/pic/wangeditor_uploadimages';
+            editor.config.menuFixed = true;
+            editor.config.zindex = 20000;
+
+            // 设置 headers（举例）
+            editor.config.uploadHeaders = {
+                'Accept': 'text/x-json'
+            };
+
+            editor.create();
+
+

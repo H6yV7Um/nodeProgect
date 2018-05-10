@@ -1,0 +1,6 @@
+extends layout
+
+block content
+  h1= title
+  p 欢迎来到 #{title}
+  p 西安檬果信息技术有限公司 荣誉出品

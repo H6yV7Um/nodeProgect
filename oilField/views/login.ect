@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>中国石油</title>
+
+    <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/img/favicon.ico">
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/public.css">
+
+    <script src="/js/jquery-2.1.1.min.js"></script>
+    <script src="/js/layer-v3.0.3/layer/layer.js "></script>
+</head>
+<style>
+    .cont{
+
+        background-image: url("../img/bg_zonglan.jpg");
+    }
+    .login{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background: rgba(0,0,0,.5);
+    }
+    .loginBox{
+        width: 50%;
+        height: 400px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto;
+        z-index: 11;
+    }
+    .input-area {
+        position: relative;
+        bottom: 0px;
+        background-color: #fff;
+        width: 95%;
+        margin-left: 2.5%;
+        padding: 20px 0;
+        box-shadow: 0 0 5px #ddd;
+    }
+    @media screen and ( max-width: 700px) {
+        .loginBox{
+            width: 100%;
+        }
+    }
+    .input-area .input-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .input-area .single-input {
+        font-size: 14px;
+        margin: 20px 2.5% 0;
+        border: 1px solid #d7d7d7;
+        padding: 10px 0;
+    }
+    .input-area .single-input label {
+        display: block;
+    }
+    .input-area .single-input label span {
+        position: relative;
+        width: 20%;
+        text-align: justify;
+        float: left;
+        padding: 5px 0;
+        margin-left: 5%;
+        height: 20px;
+    }
+    .input-area .single-input label .mustItem:before {
+        content: '＊';
+        position: absolute;
+        font-size: 18px;
+        right: -14px;
+        color: #ff8257;
+        top: 0;
+    }
+    .input-area .single-input label span:after {
+        content: '';
+        display: inline-block;
+        width: 100%;
+    }
+    .input-area .single-input label select {
+        display: inline-block;
+        outline: none;
+        padding: 5px 0;
+        width: 70%;
+        margin-left: 5%;
+        border: none;
+    }
+    .input-area .single-input label input {
+        display: inline-block;
+        outline: none;
+        padding: 5px 0;
+        width: 68%;
+        margin-left: 5%;
+        border: none;
+        height: 21px;
+        position: relative;
+        left: 1%;
+    }
+    .input-area .form-tip {
+        margin: 5px 2.5%;
+        text-align: left;
+        font-size: 12px;
+    }
+    .input-area .form-tip span {
+        color: #fb9077;
+    }
+    .input-area .sub-btn {
+        color: #fff;
+        background-color: #fb9077;
+        border: none;
+        outline: none;
+        margin: 20px 2.5%;
+        display: block;
+        width: 95%;
+        height: 40px;
+        line-height: 40px;
+        font-size: 16px;
+        border-radius: 10px;
+        box-shadow: 0 0 5px #fb9077;
+    }
+    .input-area .sub-btn:active {
+        opacity: 0.7;
+    }
+
+</style>
+<body>
+<div class="cont">
+    <div class="login">
+        <div class="loginBox">
+            <!--<form method="post" id="myForm" action="/login">-->
+            <div class="input-area login-area">
+                <div class="input-title" style="text-align: center">登录</div>
+
+                <div class="single-input">
+                    <label for="userName">
+                        <span class="mustItem">用户名</span>
+                        <input type="text" placeholder="填写用户名" id="userName">
+                    </label>
+                </div>
+                <div class="single-input">
+                    <label for="pass">
+                        <span class="mustItem">密码</span>
+                        <input type="password" placeholder="填写密码" id="pass">
+                    </label>
+                </div>
+                <div class="form-tip">
+                    <span>＊</span>为必填项
+                </div>
+                <button class="sub-btn singUp">提交</button>
+            </div>
+            <!--</form>-->
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $(function () {
+        $(".singUp").click(function (e) {
+            var userName = $("#userName").val();
+            var pass = $("#pass").val();
+            if(userName.trim()==''||pass.trim()==''){
+                layer.msg('请填写输入框的内容')
+                return false;
+            }
+            $.post("/login", {
+                userName:userName,
+                pass:pass
+            }, function (data) {
+                if (data.error == '0') {
+                    window.location.href='/dist/index.html'
+                }else if (data.error == '10002'){
+                    layer.msg('密码错误!')
+                }else if (data.error == '10001'){
+                    layer.msg('用户名不存在!')
+                }else if (data.error == '3'){
+                    layer.msg('请重试')
+                }
+            })
+            return false;
+        })
+    })
+
+</script>
+</html>

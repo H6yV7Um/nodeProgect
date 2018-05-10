@@ -1,0 +1,94 @@
+<% extend '../views/layout' %>
+
+<% block 'title' : %>
+<title><%= @title %></title>
+
+<style>
+	.cont{
+	
+  background-image: url("../img/bg_zonglan.jpg");
+	}
+
+</style>
+<% end %>
+
+<% block 'content' : %>
+  <div class="con">
+	<div class="con-left">
+	  <div class="weather">
+		<p>
+		  <span class="tempNum">12</span>
+		  <!--<span class="tempSign">℃</span>-->
+		  <span class="stats">多云转晴</span>
+		</p>
+		<p>
+		  <span class="wind">西北风3级</span>
+		  <span class="date">2017年12月20日</span>
+		</p>
+	  </div>
+	  <div class="left-cir">
+		<canvas id="circle"></canvas>
+		<canvas id="myCanvas"></canvas>
+          <div class="leftNum">
+              <p><%= @total %>方</p>
+              <p>一分钟更新一次数据</p>
+          </div>
+          <div class="info">
+              <p>总油量统计</p>
+          </div>
+	  </div>
+		<div class="leftOilNum">
+			<p>总油量：</p>
+			<p><%= @total %>方</p>
+		</div>
+	</div>
+	<div class="con-right">
+	  <div class="right-title">petrochina</div>
+		<input type="hidden" value="<%= @sitearr %>" id="stock">
+	  <ul id="stockBox">
+	  </ul>
+	</div>
+  </div>
+
+<script src="js/circle.js"></script>
+<script>
+	$(function () {
+        setInterval(function () {
+            $.get('/')
+        },60000)
+		var stock=$('#stock').val()
+		stock=JSON.parse(stock)
+            var i, len = stock.length, j, d;
+		for(i=0; i<len; i++){
+                for(j=0; j<len; j++){
+                    if(stock[i].siteNum > stock[j].siteNum){
+                        d = stock[j]; stock[j] = stock[i]; stock[i] = d;
+                    }
+                }
+            }
+		var long=[]
+		for(var m=0;m<stock.length;m++){
+		    long.push((stock[m].siteNum/stock[0].siteNum)*100)
+		}
+		stock.forEach(function (val,ind) {
+			long.forEach(function (value,index) {
+			    if(ind==index){
+                    $('#stockBox').append(`
+					<li>
+
+						<span class="right_name">${val.siteName}</span>
+						<div class="bg">
+							<div class="orange" style="width: ${value}%"></div>
+						</div>
+						<span class="rightNum">${val.siteNum}方</span>
+
+					</li>`)
+				}
+			})
+        })
+    })
+</script>
+<% end %>
+
+<% block 'script' : %>
+<% end %>

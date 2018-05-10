@@ -1,0 +1,80 @@
+.posterBg{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left:0;
+    top:0;
+    z-index: 1;
+}
+img.shopLogo{
+    width: 110px;
+    height: 110px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -57px;
+    margin-top: -36px;
+    z-index: 3;
+    border-radius: 50%;
+}
+img.shopPicture{
+    width: 100%;
+    min-height: 470px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: auto;
+    z-index: 0;
+}
+.previewBox p.shopIntro{
+    width: 266px;
+    height: 120px;
+    position: absolute;
+    left: 31px;
+    bottom: 31px;
+    font-size: 13px;
+    overflow: hidden;
+    z-index: 2;
+    color: #fff;
+}
+#pcode{
+    position: absolute;
+    bottom: 45px;
+    right: 31px;
+    width: 108px;
+    z-index: 2;
+}
+#name{
+    position: absolute;
+    left: 239px;
+    bottom: 236px;
+    font-size: 25px;
+    z-index: 2;
+    color: #F5D089;
+}
+#userphoto{
+    position: absolute;
+    z-index: 3;
+    width: 42px;
+    left: 150px;
+    bottom: 224px;
+}
+.iam{
+    position: absolute;
+    z-index: 2;
+    bottom: 232px;
+    left: 201px;
+    font-size: 18px;
+    color: #3EC3D3;
+}
+p.shopname{
+    position: absolute;
+    z-index: 2;
+    color: #3EC3D3;
+    bottom: 183px;
+    left: 50%;
+    font-size: 18px;
+}
+#support{
+    position: absolute;right: 6px;bottom: 5px;z-index: 12;width: 150px
+}

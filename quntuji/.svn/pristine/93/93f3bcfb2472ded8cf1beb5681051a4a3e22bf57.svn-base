@@ -1,0 +1,14 @@
+/**
+ * 群相册批次图片表Schema
+ */
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+var PhotoSchema = new mongoose.Schema({
+	albumId:String,                              //相册objectId
+	downloadUrl:String,                               //相册下载地址
+	fileid: String,                    //图片key值
+	wxytUrl:String,                             //万象优图url
+	patchId:String,                //上传批次
+	createTime:Number,                                 //创建时间
+});
+mongoose.model('Photo', PhotoSchema);

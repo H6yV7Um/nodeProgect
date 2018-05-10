@@ -1,0 +1,853 @@
+var express = require('express');
+var router = express.Router();
+var mongoose = require("mongoose");
+var User = mongoose.model("User");
+var Order = mongoose.model("Order");
+var Album = mongoose.model("Album");
+var AlbumUser = mongoose.model("AlbumUser");
+var Finance = mongoose.model("Finance");
+var Withdraw = mongoose.model("Withdraw");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var Photo = mongoose.model("Photo");
+var FlockAlbum = mongoose.model("FlockAlbum");
+var Flock = mongoose.model("Flock");
+var FlockUser = mongoose.model("FlockUser");
+var Admin = mongoose.model("Admin");
+var Feedback = mongoose.model("Feedback");
+var BugTrack = mongoose.model("BugTrack");
+var errors = require("../common/errors");
+var redisClient = require("../common/redisClient");
+var redisPrefix = require("../common/redisPrefix");
+var vipConfig = require("../common/vipConfig");
+var config = require("../common/config");
+var WXPay = require('weixin-pay');
+var functions = require("../common/functions");
+var fs = require("fs");
+var md5 = require('md5');
+
+/**
+ * 数组相减
+ * @param arr
+ * @returns {Array}
+ */
+Array.prototype.minus = function (arr) {
+	var result = new Array();
+	var obj = {};
+	for (var i = 0; i < arr.length; i++) {
+		obj[arr[i]] = 1;
+	}
+	for (var j = 0; j < this.length; j++) {
+		if (!obj[this[j]])
+		{
+			obj[this[j]] = 1;
+			result.push(this[j]);
+		}
+	}
+	return result;
+};
+
+/**
+ * 刷新用户信息
+ * onLunch时调用
+ */
+router.get('/refreshuser', function (req, res, next) {
+	var user = req.$wxUserInfo;
+	//console.log("刷新用户************************************************************************************************")
+	User.findOne({openId: user.openId}, function (err, docs) {
+		if (!err) {
+			/*刷新缓存*/
+			redisClient.set(redisPrefix + user.openId, JSON.stringify(user));
+			redisClient.expire(redisPrefix + user.openId, 86400);
+
+			if (docs) {              //有此用户,则更新
+				//判断个人信息有无更新
+				var oleCode = docs.changeCheckCode;
+				var newCode = md5(JSON.stringify(user));
+				if (oleCode == newCode){//没变更
+					res.status(200).json({
+						error:0,
+						message:'success',
+						data:user,
+					});
+				}else {//有变更
+					let newUser = Object.assign({},user,{changeCheckCode:newCode});
+					User.update({openId: user.openId}, newUser, function (err1, docs1) {
+						if (!err1) {
+							res.status(200).json({
+								error:0,
+								message:'success',
+								data:user,
+							});
+						} else {
+							res.status(200).json(errors.error3);
+						}
+					})
+				}
+
+			} else {                 //无此用户,则添加
+				var newUser = new User({
+					nickName: req.$wxUserInfo.nickName,                                //姓名
+					gender: req.$wxUserInfo.gender,                                  //性别
+					language: req.$wxUserInfo.language,                                //语言
+					city: req.$wxUserInfo.city,                                    //城市
+					country: req.$wxUserInfo.country,                                 //国家
+					avatarUrl: req.$wxUserInfo.avatarUrl,                               //头像
+					openId: req.$wxUserInfo.openId,                                  //openid
+					changeCheckCode:md5(JSON.stringify(user)),
+					money: 0,                                   //我的零钱（元）
+					vipLevel: 0,
+					expireTime: 0,
+					createTime: Date.now(),                              //创建时间
+				});
+				newUser.save(function (err2, docs2) {
+					if (!err2) {
+						res.status(200).json({
+							error:0,
+							message:'success',
+							data:{
+								nickName: req.$wxUserInfo.nickName,                                //姓名
+								gender: req.$wxUserInfo.gender,                                  //性别
+								language: req.$wxUserInfo.language,                                //语言
+								city: req.$wxUserInfo.city,                                    //城市
+								country: req.$wxUserInfo.country,                                 //国家
+								avatarUrl: req.$wxUserInfo.avatarUrl,                               //头像
+								openId: req.$wxUserInfo.openId,                                  //openid
+							},
+						});
+					} else {
+						res.status(200).json(errors.error3);
+					}
+				});
+			}
+		} else {
+			res.status(200).json(errors.error3);
+		}
+	});
+});
+
+/**
+ * 查看我的联动相册列表
+ */
+router.get("/mylinkalbums/:page",function (req, res, next) {
+	var page = req.params.page;
+
+	var start = (parseInt(page) - 1) * 10;
+	var openId = req.$wxUserInfo.openId;
+
+	Album.find({creatorOpenId:openId,isLinkAlbum:1}).sort({isShow:-1,createTime:-1}).skip(start).limit(10).exec(function(err1,docs1){
+		if(err1){
+			res.status(200).json(errors.error3);
+		}else {
+			res.status(200).json({
+				error:0,
+				message:'success',
+				data:docs1
+			});
+		}
+	});
+})
+
+/**
+ * 获取当前用户(我的)权限
+ */
+router.get("/getmyauthority/:openId", function (req, res, next) {
+	var openId = req.params.openId;
+
+	User.findOne({openId: openId}, function (err, docs) {
+		if (!err) {
+			var vipLevel = docs.vipLevel;
+			var authority;
+			switch (vipLevel) {
+				case 0:
+					authority = vipConfig.authority.vip0;
+					break;
+				case 1:
+					authority = vipConfig.authority.vip1;
+					break;
+				case 2:
+					authority = vipConfig.authority.vip2;
+					break;
+				case 3:
+					authority = vipConfig.authority.vip3;
+					break;
+			}
+			res.status(200).json({
+				error: 0,
+				message: "success",
+				data: authority,
+			});
+		} else {
+			res.status(200).json(errors.error3);
+		}
+	});
+});
+
+/**
+ * 用户已上传图片数量/已创建相册数量
+ */
+router.get("/getpicalbumcount/:openId", function (req, res, next) {
+	var openId = req.params.openId;
+
+	Album.find({creatorOpenId: openId,isLinkAlbum:1, isShow:1}, function (err2, data2) {
+		if (err2) {
+			res.status(200).json(errors.error3);
+		} else {
+			//已创建的相册数量
+			var albumNum = data2.length;
+			//已上传的图片数量
+			var picNum = 0;
+			for (var i=0;i<data2.length;i++) {
+				picNum += data2[i].photoNum;
+			}
+			res.status(200).json({
+				error:0,
+				message:'success',
+				data:{
+					albumNum:albumNum,
+					picNum:picNum,
+				}
+			})
+		}
+	});
+});
+
+/**
+ * 会员中心首页
+ */
+router.get("/myhome", function (req, res, next) {
+	var openId = req.$wxUserInfo.openId;
+
+	var banner = require("../common/bannerPic");
+
+	var bannerNum = Math.floor(Math.random() * (banner.length));             //生成随机用户的序号
+	User.findOne({openId: openId}, function (err, docs) {
+		if (err) {
+			res.status(200).json(errors.error3);
+		} else {
+			res.status(200).json({
+				error: 0,
+				message: 'success',
+				data: {
+					user:docs,
+					background:banner[bannerNum],
+				},
+			});
+		}
+	})
+});
+
+/**
+ * 会员收费简介
+ */
+router.get("/vipprice/:level", function (req, res, next) {
+	var level = req.params.level;
+	var ret = functions.getVipLevelPrice(level);
+	res.status(200).json({
+		error: 0,
+		message: "success",
+		data: ret,
+	})
+});
+
+/**
+ * 创建支付订单
+ */
+router.post("/rechargevip", function (req, res, next) {
+	var level = req.body.level;               //1-3
+	var timeLength = req.body.timeLength;        //0-5
+	var orderNo = req.body.orderNo;
+
+	var attach = config.appName;
+	var body;
+
+	var vipData = functions.getVipLevelPrice(level);
+	switch (level) {
+		case '1':
+			body = config.appName + " - " + vipConfig.authority.vip0.name;
+			break;
+		case '2':
+			body = config.appName + " - " + vipConfig.authority.vip1.name;
+			break;
+		case '3':
+			body = config.appName + " - " + vipConfig.authority.vip2.name;
+			break;
+	}
+
+	switch (timeLength) {
+		case '0':
+			body = body + " (1个月)";
+			break;
+		case '1':
+			body = body + " (3个月)";
+			break;
+		case '2':
+			body = body + " (6个月)";
+			break;
+		case '3':
+			body = body + " (1年)";
+			break;
+		case '4':
+			body = body + " (2年)";
+			break;
+		case '5':
+			body = body + " (3年)";
+			break;
+	}
+
+	var openid = req.$wxUserInfo.openId;
+	var total_fee = vipData.price[timeLength] * 100;
+	//total_fee = 1;
+	var notify_url = config.siteUrl + '/1.0/service/notify'; //通知地址
+	var ip = req.ip;
+	//console.log("金额：" + total_fee);
+
+	var wxpay = WXPay({
+		appid: config.weappConfig.appId,
+		mch_id: config.weappConfig.mchId,
+		partner_key: config.weappConfig.wxPayKey, //微信商户平台API密钥
+		pfx: fs.readFileSync(config.weappConfig.certFile), //微信商户平台证书
+	});
+	wxpay.getBrandWCPayRequestParams({
+		attach: attach,
+		body: body,
+		out_trade_no: orderNo,
+		total_fee: total_fee,
+		spbill_create_ip: ip,
+		notify_url: notify_url,
+		openid: openid,
+	}, function (err, data) {
+		//存入订单表
+		var order = new Order({
+			ownerId: openid,                             //拥有者用户Id
+			orderNo: orderNo,                             //订单号
+			status: 0,                              //订单状态,0未付款,1已付款
+			source: 'M',								//订单来源。M会员充值；A相册查看
+			content: {
+				vipLevel: level,
+				timeLength: timeLength
+			},
+			price: (total_fee / 100).toFixed(2),                               //订单总价
+			createTime: Date.now(),                          //生成时间
+		});
+		order.save(function () {
+		});
+		res.status(200).json({
+			error: 0,
+			message: 'success',
+			data: data,
+		});
+	});
+});
+
+/**
+ * 查看用户是否购买了某个相册的查看权限
+ */
+router.get("/checkisboughtalbum/:albumId",function (req, res, next) {
+	var albumId = req.params.albumId;
+
+	AlbumUser.count({albumId:albumId,userOpenId:req.$wxUserInfo.openId},function (e,v) {
+		if (e){
+			res.status(200).json(errors.error3);
+		}else {
+			var isBought = 0;
+			if(v>0){
+				isBought = 1;
+			}
+			res.status(200).json({
+				error:0,
+				message:'success',
+				data:{
+					isBought:isBought,
+				}
+			})
+		}
+	})
+})
+
+/**
+ * 用户购买查看某个相册的权限
+ */
+router.post("/buyalbum", function (req, res, next) {
+	var albumId = req.body.albumId;
+	var orderNo = req.body.orderNo;
+	var attach = config.appName;
+	var body;
+
+	//查看相册的价格
+	Album.findOne({_id: mongoose.Types.ObjectId(albumId)}, function (err, data) {
+		if (err) {
+			res.status(200).json(errors.error3);
+		} else {
+			var price = data.price;
+			if (price > 0) {
+				body = "查看相册《" + data.albumName + "》";
+				var mch_id = config.weappConfig.mchId;
+				var openid = req.$wxUserInfo.openId;
+				var total_fee = price * 100;
+				//total_fee = 10;
+				var notify_url = config.siteUrl + '/1.0/service/notify'; //通知地址
+				var ip = req.ip;
+
+				var wxpay = WXPay({
+					appid: config.weappConfig.appId,
+					mch_id: config.weappConfig.mchId,
+					partner_key: config.weappConfig.wxPayKey, //微信商户平台API密钥
+					pfx: fs.readFileSync(config.weappConfig.certFile), //微信商户平台证书
+				});
+
+				wxpay.getBrandWCPayRequestParams({
+					attach: attach,
+					body: body,
+					out_trade_no: orderNo,
+					total_fee: total_fee,
+					spbill_create_ip: ip,
+					notify_url: notify_url,
+					openid: openid,
+				}, function (err, data) {
+					//存入订单表
+					var order = new Order({
+						ownerId: openid,                             //拥有者用户Id
+						orderNo: orderNo,                             //订单号
+						status: 0,                              //订单状态,0未付款,1已付款
+						source: 'A',								//订单来源。M会员充值；A相册查看
+						content: {
+							albumId: albumId
+						},
+						price: total_fee / 100,                               //订单总价
+						createTime: Date.now(),                          //生成时间
+					});
+					order.save(function () {
+					});
+					res.status(200).json({
+						error: 0,
+						message: 'success',
+						data: data,
+					});
+				});
+
+			} else { //该相册无需付费
+				res.status(200).json(errors.error10003);
+			}
+		}
+	});
+});
+
+/**
+ * 用户申请提现
+ * 限额:1元 - 2万元
+ */
+router.post("/applywithdraw", function (req, res, next) {
+	amount = parseFloat(req.body.amount).toFixed(2);
+
+	var openId = req.$wxUserInfo.openId;
+
+	if ((amount < 1) || (amount > 20000)) {
+		res.status(200).json(errors.error12);
+	} else {
+		User.findOne({openId: openId}, function (err, docs) {
+			if (err) {
+				res.status(200).json(errors.error3);
+			} else {
+				if (docs.money < amount) {//钱包余额不足
+					res.status(200).json(errors.error10);
+				} else {
+					var orderNo = "T" + Date.now() + functions.randomnum(4);
+					var withdraw = new Withdraw({
+						orderNo: orderNo,            //订单号
+						amount: amount,                               //提现金额(元)
+						openId: openId,                               //提现账户的openid
+						nickName: req.$wxUserInfo.nickName,                             //提现者昵称
+						avatarUrl: req.$wxUserInfo.avatarUrl,                            //提现者头像
+						isWithdraw: 0,                                //是否提现成功1成功0未成功
+						approverOpenId: '',                       //审核者openId
+						approverNickname: '',                     //审核者昵称
+						approverAvatarUrl: '',                    //审核者头像
+						createTime: Date.now(),                           //创建时间
+						withdrawTime: 0,                         //提现成功时间
+					});
+					withdraw.save(function (err1, docs1) {
+						//修改用户账户余额
+						var newMoney = Math.round((docs.money - amount)*100)/100;
+						User.update({openId: openId}, {$set: {money: newMoney}}, function (err, docs) {
+							if(err){
+								res.status(200).json(errors.error3);
+							}else {
+								res.status(200).json(errors.error0);
+							}
+						});
+					});
+				}
+			}
+		})
+	}
+});
+
+
+/**
+ * 创建联动相册
+ */
+router.post("/createlinkalbum", function (req, res, next) {
+
+	var openId = req.body.openId;
+	var name = req.body.name;
+	var description = req.body.description;
+	var price = (parseFloat(req.body.price)).toFixed(2);
+
+	if (openId == req.$wxUserInfo.openId){
+		var album = new Album({
+			coverPic:'',                                //封面图片
+			creatorOpenId:req.$wxUserInfo.openId,                           //创建者openid
+			creatorName:req.$wxUserInfo.nickName,                             //创建者昵称
+			creatorHeadPic:req.$wxUserInfo.avatarUrl,                          //创建者头像
+			albumName:name,                               //相册名称
+			albumDescription:description,                        //相册描述
+			isLinkAlbum:1,                             //是否是联动相册.0不是,是群相册;1是
+			price:price,                                   //价格（元）
+			photoNum:0,                                //照片数量,默认为0
+			isShow:1,
+			createTime:Date.now(),                              //创建时间
+			updateTime:Date.now(),                              //更新时间
+		});
+		album.save(function (err, data) {
+			if(err){
+				res.status(200).json(errors.error3);
+			}else {
+				res.status(200).json({
+					error:0,
+					message:'success',
+					data:data,
+				})
+			}
+		})
+	}else {
+		res.status(200).json(errors.error8);
+	}
+});
+
+/**
+ * 用户查看所有群(和某相册的联动的群)列表
+ */
+router.get("/checklinkedflocks/:albumId", function (req, res, next) {
+	var albumId = req.params.albumId;
+
+	var openId = req.$wxUserInfo.openId;
+	FlockAlbum.find({albumId:albumId,openGId:{$ne:''}},function (err, data) {
+		if (err){
+			res.status(200).json(errors.error3);
+		}else{
+			var ids = [];
+			for (var i = 0; i < data.length; i++){
+				ids.push(data[i].openGId);
+			}
+			//查看自己的所有群信息
+			FlockUser.find({openId:openId,openGId:{$ne:''}},function (err1, data1) {
+				if (err1){
+					res.status(200).json(errors.error3);
+				}else{
+					var allIds = [];
+					for (var j=0;j<data1.length;j++){
+						allIds.push(data1[j].openGId);
+					}
+					Flock.find({openGId:{$in:allIds}},function (err3, data3) {
+						if (err3){
+							res.status(200).json(errors.error3);
+						}else{
+							var allFlocks = data3;
+							//查看联动的群列表
+							var linkedFlocks = [];
+							var notLinkedFlocks = [];
+							for (var i = 0; i < allFlocks.length; i++){
+								for (var j = 0; j < ids.length; j++){
+									if(allFlocks[i].openGId == ids[j]){
+										linkedFlocks.push(allFlocks[i]);
+									}
+								}
+							}
+							var notLinkedFlocks = allFlocks.minus(linkedFlocks);
+							res.status(200).json({
+								error:0,
+								message:'success',
+								data:{
+									linkedFlocks:linkedFlocks,
+									notLinkedFlocks:notLinkedFlocks,
+								}
+							})
+							/*Flock.find({openGId:{$in:ids}},function (err2, data2) {
+								if (err2){
+									res.status(200).json(errors.error3);
+								}else{
+									var linkedFlocks = data2;
+
+									var notLinkedFlocks = allFlocks.minus(linkedFlocks);
+
+									res.status(200).json({
+										error:0,
+										message:'success',
+										data:{
+											linkedFlocks:linkedFlocks,
+											notLinkedFlocks:notLinkedFlocks,
+										}
+									})
+								}
+							})*/
+						}
+					});
+
+
+				}
+			})
+		}
+	})
+})
+
+
+/**
+ * 用户关联联动图集到群组
+ */
+router.post("/linkalbum2flocks", function (req, res, next) {
+	var albumId = req.body.albumId;
+	var oldOpenGIds = JSON.parse(req.body.oldOpenGIds);
+	var newOpenGIds = JSON.parse(req.body.newOpenGIds);
+
+	//查看相册的照片数量
+	Album.findOne({_id:mongoose.Types.ObjectId(albumId)},function (err, value) {
+		if(err){
+			res.status(200).json(errors.error3);
+		} else {
+			if (value){
+				req.body.photoNum = value.photoNum;
+				next();
+			}
+		}
+	})
+}, function (req, res, next) {
+	var albumId = req.body.albumId;
+	var oldOpenGIds = JSON.parse(req.body.oldOpenGIds);
+	var newOpenGIds = JSON.parse(req.body.newOpenGIds);
+	var photoNum = parseInt(req.body.photoNum);
+
+	var removed = oldOpenGIds.minus(newOpenGIds);
+	var added = newOpenGIds.minus(oldOpenGIds);
+
+
+	//查看此相册关联的群，刷新群图集缓存
+	FlockAlbum.find({openGId: {$in:removed},albumId:albumId}, function (err, data) {
+		var ids = [];
+		for (var i=0; i<data.length;i++) {
+			ids.push(data[i].openGId);
+		}
+		Flock.update({openGId: {$in: ids}}, {$inc: {photoNum: (0 - photoNum)}}, function (e, v) {
+			for (var i=0; i<data.length;i++) {
+				functions.buildFlockInfoCache(data[i].openGId, function () {});
+			}
+		});
+		FlockAlbum.remove({openGId: {$in:removed},albumId:albumId}, function (err, data) {});
+	});
+	Flock.update({openGId: {$in: added}}, {$inc: {photoNum: photoNum}}, function (e, v) {
+		for (var i=0; i<added.length;i++) {
+			functions.buildFlockInfoCache(added[i], function () {});
+			var fa = new FlockAlbum({
+				openGId:added[i],                                 //群的openId
+				albumId:albumId,                                 //相册objectId
+				createTime:Date.now(),                              //关联时间
+			});
+			fa.save(function () {});
+		}
+	});
+	res.status(200).json(errors.error0);
+});
+
+
+/**
+ * 用户点赞
+ */
+router.post("/userlike",function (req, res, next) {
+
+	var patchId = req.body.patchId;
+	var openGId = req.body.openGId;
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+	PatchPhoto.update({patchId:patchId}, {$addToSet:{likes:{openId:openId,nickName:nickName}}},function(err,data){
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			functions.buildFlockInfoCache(openGId,function () {});
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 用户取消点赞
+ */
+router.post("/usercancellike",function (req, res, next) {
+	var patchId = req.body.patchId;
+	var openGId = req.body.openGId;
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+	PatchPhoto.findOne({patchId:patchId},function(err1,data1){
+		if(err1){
+			res.status(200).json(errors.error3);
+		}else{
+			var likes = data1.likes;
+			for (var i = 0; i< likes.length; i++){
+				if (likes[i].openId == openId){
+					likes.splice(i,1);
+				}
+			}
+			PatchPhoto.update({patchId:patchId}, {likes:likes},function(err,data){
+				if(err){
+					res.status(200).json(errors.error3);
+				}else{
+					functions.buildFlockInfoCache(openGId,function () {});
+					res.status(200).json(errors.error0);
+				}
+			});
+		}
+	});
+
+
+
+});
+
+/**
+ * 用户评论
+ */
+router.post("/usercomment",function (req, res, next) {
+	var patchId = req.body.patchId;
+	var openGId = req.body.openGId;
+	var comment = req.body.comment;
+
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+
+	PatchPhoto.update({patchId:patchId}, {$addToSet:{comments:{openId:openId,nickName:nickName,comment:comment}}},function(err,data){
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			functions.buildFlockInfoCache(openGId,function () {});
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 提交意见反馈
+ */
+router.post("/feedback",function (req, res, next) {
+
+	var content = req.body.content;
+	var phone = req.body.phone;
+
+	var fb = new Feedback({
+		content:content,
+		phone:phone,
+		isResolved:0,              //是否已处理.0未处理,1已处理
+		createTime:Date.now(),
+	});
+	fb.save(function (err, docs) {
+		if (err){
+			res.status(200).json(errors.error3);
+		}else{
+			var receivers = config.emailConfig.receivers;
+			var subject = config.appName + "意见反馈";
+			var con = "<p>反馈内容:" + content + "</p>" +
+				"<p>电话:" + phone + "</p>";
+			for(var i=0; i<receivers.length;i++){
+				functions.sendMail(receivers[i],subject,con,function () {});
+			}
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 获取帮助手册
+ */
+router.get("/getmanual", function (req, res, next) {
+	var manual = require("../common/manual");
+
+	res.status(200).json(manual);
+});
+
+/**
+ * 获取关于我们信息
+ */
+router.get("/getaboutus", function (req, res, next) {
+	var aboutUs = require("../common/aboutUs");
+
+	res.status(200).json(aboutUs);
+});
+
+/**
+ * 我的钱包-查看明细
+ */
+router.get("/financedetail/:page",function (req, res, next) {
+	var openId = req.$wxUserInfo.openId;
+	var page = req.params.page;
+
+	var start = (parseInt(page) - 1) * 10;
+
+			Finance.find({openId:openId}).sort({createTime:-1}).skip(start).limit(10).exec(function(err1,docs1){
+				if(err1){
+					res.status(200).json(errors.error3);
+				}else {
+
+					if ((page == '1')||(page == 1)){
+						Withdraw.find({openId:openId, isWithdraw:0}).sort({createTime:-1}).exec(function(err,docs) {
+							if (err) {
+								res.status(200).json(errors.error3);
+							} else {
+
+								res.status(200).json({
+									error:0,
+									message:'success',
+									data:{
+										withdraw:docs,                      //审核中的提现申请
+										finance:docs1                       //财务明细
+									}
+								});
+							}
+						});
+					}else{
+						res.status(200).json({
+							error:0,
+							message:'success',
+							data:{
+								withdraw:[],                      //审核中的提现申请
+								finance:docs1                       //财务明细
+							}
+						});
+					}
+				}
+			});
+
+})
+
+/**
+ * bug跟踪接口
+ */
+router.post("/bugtrack", function (req, res, next) {
+	var info = req.body.info;
+	var bugTrack = new BugTrack({
+		info:info,                        //bug信息
+		createTime:Date.now(),                  //时间
+	})
+	bugTrack.save(function (err, docs) {
+		if (err){
+			res.status(200).json(errors.error3);
+		}else {
+			res.status(200).json(errors.error0);
+		}
+	})
+})
+
+
+
+module.exports = router;

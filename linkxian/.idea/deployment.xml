@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" serverName="linkxian">
+    <serverData>
+      <paths name="linkxian">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/data/www/linkxian" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

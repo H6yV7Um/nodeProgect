@@ -1,0 +1,321 @@
+<% extend '../views/layout' %>
+
+<% block 'title' : %>
+<title><%- @pageTitle %></title>
+<% end %>
+
+
+<% block 'content' : %>
+<style>
+    .shadow{
+        display: none;
+        position: fixed;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        background: rgba(0,0,0,.3);
+        z-index: 3;
+    }
+    .upBox{
+        width: 350px;
+        height: 255px;
+        background: #fff;
+        border-radius: 10px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        padding: 25px 20px;
+        text-align: center;
+    }
+    .upBox >p{
+        font-size: 22px;
+    }
+    .btnnow{
+        width: 100%;
+        padding: 8px 10px;
+        background: #fff;
+        border-radius: 5px;
+        border: 1px solid #2d8cf0;
+        color: #2d8cf0;
+    }
+    .btnnow:hover{
+        background: #2d8cf0;
+        border: 1px solid #2d8cf0;
+        color: #fff;
+    }
+</style>
+
+
+    <div style="width: 86%;padding:20px 1%;float: left">
+        <div class="row">
+            <div class="col-sm-12">
+                <section class="panel" style="border: 1px solid #efefef;">
+                    <header class="panel-heading">
+                        订单列表
+                        <button class="btn btn-primary pull-right newBtn addTicket" type="button"><i class="fa fa-plus"></i> 添加票</button>
+                    </header>
+                    <div class="panel-body">
+                        <div class="adv-table editable-table ">
+                            <!--<form class="form-horizontal adminex-form" method="get" id="searchInstitution">-->
+                                <!--<div class="form-group">-->
+                                    <!--<label for="goodsOrder" class="col-sm-1 myStyleListLabel">商品序号</label>-->
+                                    <!--<div style="position: relative;" class="col-sm-2 m-bot15">-->
+                                        <!--<input type="text" class="form-control" id="goodsOrder">-->
+                                    <!--</div>-->
+                                    <!--<label for="goodsName" class="col-sm-1 myStyleListLabel">商品名称</label>-->
+                                    <!--<div style="position: relative;" class="col-sm-2 m-bot15">-->
+                                        <!--<input type="text" class="form-control" id="goodsName">-->
+                                    <!--</div>-->
+                                    <!--<label class="col-sm-1 myStyleListLabel" for="goodsDescribe">商品描述</label>-->
+                                    <!--<div class="col-lg-2 col-sm-2">-->
+                                        <!--<input type="text" class="form-control" id="goodsDescribe">-->
+                                    <!--</div>-->
+                                    <!--<button type="button" class="btn btn-primary" onclick="search()">搜索</button>-->
+                                <!--</div>-->
+                            <!--</form>-->
+                            <div class="noData" style="display: none">
+                                暂无数据
+                            </div>
+                            <!---->
+                            <div ng-app="myApp" ng-controller="pageCtrl" ng-cloak class="ng-cloak" data-dataurl="<%= @dataurl %>" data-counturl="<%= @counturl %>" data-pagesize="<%= @pagesize %>" id="myApp">
+                                <table class="table table-striped table-hover table-bordered" id="editable-sample">
+                                    <thead>
+                                    <tr>
+                                        <th>订单号</th>
+                                        <!--<th>姓名</th>-->
+                                        <!--<th>身份证号</th>-->
+                                        <th>票号</th>
+                                        <th>票类</th>
+                                        <th>票价</th>
+                                        <th>购买渠道</th>
+                                        <th>购买方式</th>
+                                        <th>卖出时间</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="x in items" on-finish-render-filters>
+                                        <!--<th>订单号</th>-->
+                                        <!--&lt;!&ndash;<th>姓名</th>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<th>身份证号</th>&ndash;&gt;-->
+                                        <!--<th>票号</th>-->
+                                        <!--<th>票类</th>-->
+                                        <!--<th>票价</th>-->
+                                        <!--<th>购买渠道</th>-->
+                                        <!--<th>购买方式</th>-->
+                                        <!--<th>卖出时间</th>-->
+
+                                        <td>{{ x.orderNo }}</td>
+                                        <!--<td>{{ x.name }}</td>-->
+                                        <!--<td>{{ x.identity }}</td>-->
+                                        <td>{{ x.ticketNo }}</td>
+                                        <td>{{ x.ticketType }}</td>
+                                        <td>{{ x.price }}</td>
+                                        <td>{{ x.channel }}</td>
+                                        <td>{{ x.way }}</td>
+                                        <td>{{ x.saleTime }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <div>
+                                    <ul class="pagination pagination-sm">
+                                        <li><a data-ng-click='first()'>首页</a></li>
+                                        <li data-ng-repeat="page in pagelist" data-ng-class="{active:isactivepage(page)}"><a data-ng-click='selectpage(page)'>{{page}}</a></li>
+                                        <li><a data-ng-click='last()'>尾页</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <div class="shadow">
+        <form class="upBox">
+            <p>上传票</p>
+            <div style="margin-top: 15px">
+                <a href="xls/票务模板.xlsx" style="display: inline-block;margin-bottom: 15px;width: 100%">
+                    <button class="btnnow downloadTem" type="button"> 下载模板</button>
+                </a>
+                <div class="btnnow upXls" style="position: relative">
+                    上传表格
+                    <input type="file" style="position: absolute;opacity: 0;left: 0;top: 0;width:100%;height: 100%;">
+                </div>
+
+                <!--<button class="btnnow upXls" type="button">上传表格</button>-->
+                <!--<div class="upStatus" style="color: #16b316;padding-top: 6px;position: absolute;text-align: center; font-size: 12px;left: 43%;">-->
+                    <!--<p class="successStatus" style="display: none">上传成功</p>-->
+                    <!--<p class="errorStatus" style="display: none">上传失败</p>-->
+                <!--</div>-->
+
+            </div>
+            <div style="margin-top: 30px">
+                <button type="button" class="btn btn-primary confirm">确定</button>
+            </div>
+        </form>
+    </div>
+
+<% end %>
+
+<% block 'script' : %>
+
+<script type="text/javascript" src="js/jQuery-File-Upload-9.12.5/js/vendor/jquery.ui.widget.js"></script>
+<script type="text/javascript" src="js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js"></script>
+<script type="text/javascript" src="js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js"></script>
+<script>
+    $('.addTicket').click(function () {
+        $('.shadow').show()
+    })
+    $('.confirm').click(function () {
+        $('.shadow').hide()
+    })
+
+    $('.upXls').click(function () {
+        $(this).fileupload({
+            dataType: 'json',
+            url: '/admin/upTicket',
+            maxFileSize: 2 * 1024 * 1024,
+            done: function (e, data) {
+                var ret = data.result;
+                switch (ret.error) {
+                    case '0':
+                        layer.msg('上传成功')
+                        break;
+                    case '3':
+                        layer.msg('数据库错误')
+                        break;
+                    case '6':
+                        layer.msg('文件大小不能超过2M')
+                        break;
+                    case '7':
+                        layer.msg('只允许上传.xls或.xlsx的文件')
+                        break;
+                }
+            },
+            fail: function (e, data) {
+                alert("上传出错了");
+            }
+        });
+    })
+    function search() {
+        var goodsOrder = $('#goodsOrder').val().trim() || "不限";
+        if(!/^[0-9]*$/.test(goodsOrder)&&goodsOrder!="不限"){
+            $.scojs_message('商品序号必须为数字', $.scojs_message.TYPE_ERROR);
+            return false;
+        }
+        var goodsName = $("#goodsName").val().trim() || "不限";
+        var goodsDescribe = $('#goodsDescribe').val().trim() || "不限";
+        window.location.href = '/shop/product/searchProduct/' + goodsOrder + '/' + goodsName + '/' + goodsDescribe;
+    }
+
+    var pagesize = $("#myApp").attr("data-pagesize");
+    var counturl = $("#myApp").attr("data-counturl");
+    var dataurl = $("#myApp").attr("data-dataurl");
+    var app = angular.module("myApp", []);
+    app.directive('onFinishRenderFilters', function ($timeout) {
+        return {
+            restrict: 'A',
+            link: function(scope, element, attr) {
+                if (scope.$last === true) {
+                    $timeout(function() {
+                        scope.$emit('ngRepeatFinished');
+                    });
+                }
+            }
+        };
+    });
+    app.controller("pageCtrl", function ($scope, $http) {
+        $scope.pagesize = pagesize;
+        $scope.selpage = 1;
+        $scope.pages;
+        $http({
+            method: 'get',
+            url: counturl,
+        }).success(function (data, header, config, status) {
+            $scope.data = data;
+            $scope.num = data;
+            $scope.pages = Math.ceil($scope.data / $scope.pagesize); //分页数
+            $scope.pagelist = [];
+            $scope.getdatainfo($scope.selpage);
+            $scope.pagelist = $scope.calculateIndexes($scope.selpage,$scope.pages);
+        })
+        //设置分页样式
+        $scope.isactivepage = function (page) {
+            return $scope.selpage == page;
+        };
+        //获取每页数据
+        $scope.getdatainfo = function (page) {
+            $http({
+                method: 'get',
+                url:dataurl+'/'+page,
+            }).success(function (data, header, config, status) {
+                console.log(JSON.stringify(data))
+                $scope.items = data;
+                if($scope.items.length==0){
+                    $("#myApp").hide();
+                    $(".noData").show();
+                }
+            })
+        }
+        //分页算法
+        $scope.calculateIndexes = function (current, length) {
+            //current 当前页码
+            //length  总页码
+            //displayLength  显示长度
+            var displayLength = 3;
+            var indexes = [];
+            var start = Math.round(current - displayLength / 2);
+            var end = Math.round(current + displayLength / 2);
+            if (start <= 1) {
+                start = 1;
+                end = start + displayLength - 1;
+                if (end >= length - 1) {
+                    end = length - 1;
+                }
+            }
+            if (end >= length - 1) {
+                end = length;
+                start = end - displayLength + 1;
+                if (start <= 1) {
+                    start = 1;
+                }
+            }
+            var newstart = start-1;
+            if(newstart == 0){
+                newstart = 1
+            }else{
+                newstart = newstart
+            }
+            for (var i = newstart; i <= end; i++) {
+                indexes.push(i);
+            }
+            //$scope.isactivepage(current);
+            return indexes;
+        };
+        //选择页码
+        $scope.selectpage = function (page) {
+            $scope.selpage = page;
+            $scope.getdatainfo(page);
+            $scope.pagelist = $scope.calculateIndexes(page, $scope.pages);
+        }
+        //上一页
+        $scope.first = function(){
+            $scope.selpage = 1;
+            $scope.getdatainfo($scope.selpage);
+            $scope.pagelist = $scope.calculateIndexes($scope.selpage, $scope.pages);
+        }
+        //下一页
+        $scope.last = function(){
+            $scope.selpage = $scope.pages;
+            $scope.getdatainfo($scope.selpage);
+            $scope.pagelist = $scope.calculateIndexes($scope.selpage, $scope.pages);
+        }
+    })
+
+</script>
+<% end %>

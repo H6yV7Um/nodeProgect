@@ -1,0 +1,96 @@
+/**
+ * 小程序session处理中间件
+ */
+const co = require('co');
+const { headers, errors } = require('./constants');
+const makeStore = require('./lib/makeStore');
+const sha1 = require('./lib/sha1');
+const wrapError = require('./lib/wrapError');
+const jscode2session = require('./lib/jscode2session');
+var config = require("../config");
+var redisPrefix = require("../redisPrefix");
+
+let store;
+
+const handler = co.wrap(function *(req, res, next) {
+	req.$wxUserInfo = null;
+
+	let code = String(req.header(headers.WX_CODE) || '');
+	let rawData = String(req.header(headers.WX_RAW_DATA) || '');
+	let signature = String(req.header(headers.WX_SIGNATURE) || '');
+
+	let wxUserInfo, sessionKey, openId;
+
+	// 1、`code` not passed
+	if (!code) {
+		return next();
+	}
+
+	// 2、`rawData` not passed
+	if (!rawData) {
+		try {
+			wxUserInfo = yield store.get(redisPrefix.WX_CODE + code);
+		} catch (error) {
+			return next(error);
+		}
+
+		if (!wxUserInfo) {
+			let error = new Error('`wxUserInfo` not found by `code`');
+			return res.json(wrapError(error, { reason: errors.ERR_SESSION_EXPIRED }));
+		}
+
+		req.$wxUserInfo = wxUserInfo;
+		return next();
+	}
+
+	// 3、both `code` and `rawData` passed
+	try {
+		rawData = decodeURIComponent(rawData);
+		wxUserInfo = JSON.parse(rawData);
+	} catch (error) {
+		return res.json(wrapError(error));
+	}
+
+
+
+	try {
+		({ sessionKey, openId } = yield jscode2session.exchange(code));
+	} catch (error) {
+		return res.json(wrapError(error, { reason: errors.ERR_SESSION_KEY_EXCHANGE_FAILED }));
+	}
+
+	//console.log('code======='+code);
+	//console.log('sessionKey======='+sessionKey);
+
+	// check signature
+	if (sha1(rawData + sessionKey) !== signature) {
+		let error = new Error('untrusted raw data');
+		return res.json(wrapError(error, { reason: errors.ERR_UNTRUSTED_RAW_DATA }));
+	}
+
+
+	/*保存数据*/
+	try {
+		wxUserInfo.openId = openId;
+
+		yield store.set(redisPrefix.WX_CODE+code, wxUserInfo, config.redisConfig.ttl);              //ttl为2小时
+		yield store.set(redisPrefix.WX_USERINFO+openId, wxUserInfo, 86400);                         //ttl为30天
+		yield store.set(redisPrefix.WX_SESSION_KEY+openId, sessionKey, 300);                        //ttl为5分钟
+
+		req.$wxUserInfo = wxUserInfo;
+		return next();
+
+	} catch (error) {
+		return next(error);
+	}
+
+});
+
+module.exports = (options = {}) => {
+	if (!store) {
+		store = makeStore(config.redisConfig);
+		return handler;
+	}
+
+	throw new Error('weapp-session can only be called once.');
+};

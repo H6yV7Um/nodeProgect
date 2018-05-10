@@ -1,0 +1,30 @@
+{
+  "name": "oilfield",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "async": "^2.6.0",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
+    "debug": "~2.6.9",
+    "ect": "^0.5.9",
+    "express": "~4.15.5",
+    "express-session": "^1.15.6",
+    "formidable": "^1.2.0",
+    "fs": "0.0.1-security",
+    "jade": "~1.11.0",
+    "md5": "^2.2.1",
+    "morgan": "~1.9.0",
+    "multiparty": "^4.1.3",
+    "mysql": "^2.15.0",
+    "node-xlsx": "^0.12.0",
+    "orm": "^4.0.2",
+    "request": "^2.83.0",
+    "serve-favicon": "~2.4.5",
+    "session": "^0.1.0"
+  }
+}

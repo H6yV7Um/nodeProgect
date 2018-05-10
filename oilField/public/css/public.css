@@ -1,0 +1,396 @@
+body,ul,li,ol,h1,h2,h3,h4,h5,h6,p,pre,input,form,dl,dt,dd{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+a {
+  text-decoration: none;
+}
+img{
+  border: 0;
+}
+*{
+  padding:0;
+  margin:0;
+  box-sizing: border-box;
+  font-family: "微软雅黑";
+}
+
+
+html,body{
+  width: 100%;
+  height: 100%;
+  overflow:hidden;
+}
+.cont{
+  width:100%;
+  height:100%;
+  background-size: cover;
+  background-position: center;
+}
+.total{
+  width: 100%;
+  height: 100%;
+  padding:0 3%;
+}
+.head{
+  padding-top: 30px;
+    overflow: hidden;
+}
+.head-samll{
+  padding-top: 30px;
+    overflow: hidden;
+}
+.logo{
+  float: left;
+}
+.head p{
+  float: left;
+  color: #fcf9ff;
+  font-size: 46px;
+  margin-left: 10%;
+}
+.head-samll p{
+  float: left;
+  color: #fcf9ff;
+  font-size: 46px;
+  margin-left: 10%;
+}
+nav{
+  float: right;
+  height: 60px;
+}
+nav div{
+  height: 100%;
+  float: left;
+  text-align: center;
+  position: relative;
+}
+nav div a{
+    font-size: 22px;
+    color: #fcf9ff;
+    opacity: 0.6;
+    padding: 10px 32px;
+    line-height: 60px;
+}
+nav div::before,nav div::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  margin-left: -43px;
+  width: 86px;
+  height: 3px;
+  background: #fcf9ff;
+  opacity: 0;
+  transition: opacity .3s,transform .3s;
+}
+nav div::before{
+  transform: translateY(-10px);
+  top: 0;
+}
+nav div::after{
+  bottom: 0;
+  transform: translateY(10px);
+}
+nav div:hover:after,nav div:hover:before {
+  opacity: 1;
+  -webkit-transform: translateY(0);
+  transform: translateY(0);
+}
+nav div:hover a{
+  opacity: 1;
+  color: #fcf9ff;
+  text-decoration:none;
+}
+nav div.active::before,nav div.active::after{
+  opacity: 1;
+  transform: translateY(0);
+}
+.con{
+    padding-top: 3%;
+    overflow: hidden;
+    width: 100%;
+    height: 82%;
+}
+div.con-left{
+    float: left;
+    width: 45%;
+    height: 100%;
+    position: relative;
+}
+.weather {
+    width: 100%;
+    height: 15%;
+}
+.tempNum{
+    color: #fcf9ff;
+    font-size: 40px;
+    font-family: "Helvetica Light";
+}
+.stats,.wind,.date{
+    font-size: 20px;
+    color: #fcf9ff;
+    opacity: .8;
+}
+.wind{
+    margin-right: 10px;
+}
+.left-cir{
+    width: 90%;
+    height: 80%;
+}
+canvas{
+    position: absolute;
+    left: 0;
+}
+.leftNum{
+    width: 460px;
+    text-align: center;
+    color: #fcf9ff;
+    padding-top: 28%;
+}
+.leftNum p:first-child{
+    font-size: 48px;
+}
+.leftNum p:nth-child(2){
+    font-size: 24px;
+}
+.info{
+    width: 460px;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+}
+.info p{
+    font-size: 40px;
+    color: #fcf9ff;
+}
+
+.con-right{
+    width: 53%;
+    float: right;
+    height: 100%;
+    overflow: hidden;
+}
+.right-title{
+    float: right;
+    font-family: 'Arial';
+    font-size: 22px;
+    color: #fcf9ff;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+.con-right ul{
+    width: 97%;
+    float: right;
+    padding: 15px;
+    height: 80%;
+    box-shadow: 0 0 10px #ccc;
+    margin-right: 6px;
+    overflow-y: scroll;
+}
+.con-right ul::-webkit-scrollbar {/*滚动条整体样式*/
+    width: 15px;     /*高宽分别对应横竖滚动条的尺寸*/
+    height: 15px;
+}
+.con-right ul::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    background: #36324e;
+}
+.con-right ul::-webkit-scrollbar-track {/*滚动条里面轨道*/
+    -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    border-radius: 0;
+    background: rgba(0,0,0,0);
+}
+.con-right li{
+    width: 100%;
+    padding: 10px 0;
+    overflow: hidden;
+}
+.right_name{
+    font-size: 19px;
+    color: #b6d7fa;
+    float: left;
+    width: 120px;
+}
+.bg{
+    float: left;
+    background: #211e34;
+    width: 67%;
+    height: 18px;
+    margin: 5px 0;
+    border-radius: 12px;
+    position: relative;
+    /*margin-left: 10px;*/
+}
+.orange{
+    background: #f6a900;
+    position: absolute;
+    height: 100%;
+    border-radius: 12px;
+    width: 80%;
+}
+.rightNum{
+    font-size: 18px;
+    color: #b6d7fa;
+    float: right;
+}
+.head-samll{
+    display: none;
+}
+.leftOilNum{
+    display: none;
+}
+@media screen and ( max-width: 1420px) {
+  .logo{
+    width: 160px;
+  }
+  .head p{
+    font-size: 38px;
+    margin-left: 7.5%;
+  }
+  nav{
+    height: 50px;
+  }
+  nav div a{
+    padding: 5px 24px;
+      line-height: 50px;
+  }
+  nav div::before,nav div::after{
+    width: 76px;
+    margin-left: -38px;
+  }
+    .bg{
+        width: 59%;
+    }
+
+    .head{
+        display: block;
+    }
+    .head-samll{
+        display: none;
+    }
+    .leftNum{
+        padding-top: 34%;
+    }
+}
+@media screen and ( max-width: 1138px) {
+  .logo{
+    width: 120px;
+  }
+  .head p{
+    font-size: 30px;
+    margin-left: 5.5%;
+  }
+  nav{
+    height: 40px;
+  }
+  nav div a{
+    font-size: 18px;
+      padding: 5px 15px;
+      line-height: 40px;
+  }
+  nav div::before,nav div::after{
+    width: 60px;
+    margin-left: -30px;
+  }
+
+    .bg{
+        width: 48%;
+    }
+
+    .head{
+        display: block;
+    }
+    .head-samll{
+        display: none;
+    }
+    .leftNum{
+        padding-top: 42%;
+    }
+}
+
+@media screen and ( max-width: 850px) {
+    .left-cir{
+        display: none;
+    }
+    .head{
+        display: none;
+    }
+    .head-samll{
+        display: block;
+    }
+
+    .leftNum{
+        padding-top: 42%;
+    }
+    .logo{
+        width: 100px;
+    }
+    .head-samll p{
+        margin-top: 10px;
+        font-size: 26px;
+        margin-left: 5.5%;
+    }
+    nav{
+        height: 40px;
+    }
+    nav div a{
+        line-height: 40px;
+        font-size: 18px;
+        padding: 5px 12px;
+    }
+    nav div::before,nav div::after{
+        width: 40px;
+        margin-left: -20px;
+    }
+    .tempNum {
+        font-size: 26px;
+    }
+    .stats, .wind, .date {
+        font-size: 16px;
+    }
+    div.con-left {
+        width: 100%;
+         height: 21%;
+    }
+    .con-right {
+        width: 100%;
+        float: right;
+        height: 79%;
+        padding-top: 10px;
+        overflow: hidden;
+    }
+    .con-right ul {
+        padding: 10px;
+    }
+    .right-title {
+        display: none;
+    }
+    .right_name {
+        font-size: 15px;
+        width: 100px;
+    }
+    .bg {
+        width: 42%;
+        height: 14px;
+    }
+    .rightNum {
+        font-size: 15px;
+    }
+
+    .leftOilNum{
+        float: right;
+        display: block;
+        width: 50%;
+        text-align: center;
+        color: #fcf9ff;
+        font-size: 24px;
+        margin-top: 15px;
+    }
+    .weather {
+        width: 45%;
+        float: left;
+    }
+}

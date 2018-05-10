@@ -1,0 +1,76 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+
+        title Title
+
+        style(type="text/css").
+            html{
+                font-size: 100px;
+            }
+            body{
+                font-size:14px;
+                display: flex;
+                justify-content: space-between;
+                flex-direction: column;
+            }
+            html,body{
+                height: 100%;
+                overflow-x: hidden;
+            }
+            .header{
+                text-align: center;
+                font-size: 14px;
+                margin-top: 0.5rem;
+            }
+            .section{
+                flex: 1;
+                overflow: hidden;
+                margin: 0.4rem;
+            }
+            ul li{
+                color: #333;
+                font-size: 14px;
+                /*line-height: 3rem;*/
+            }
+            .first{
+                /*line-height: 1.8rem;*/
+            }
+            ul .fix{
+                margin-left: 0px;
+                list-style-type: none;
+                font-weight: 600;
+            }
+            ul li{
+                margin-left: 0.1rem;
+                line-height: 0.4rem;
+            }
+    body
+        .header 初心咖啡券使用须知
+        .section
+            ul.first
+                li.fix 【此券可以在以下空间使用】
+
+                each x in interspace
+                    li #{x}
+
+
+
+            ul.second
+                li.fix 【使用方法】
+
+                li #{data.useMethod}
+
+
+            ul.three
+                li.fix 【使用失效】
+
+                li #{data.startTime} 至 #{data.endTime}
+
+
+            ul.four
+                li.fix 【特别须知】
+
+                li #{data.notice}
+

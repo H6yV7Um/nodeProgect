@@ -1,0 +1,19 @@
+/**
+ * 群相册批次图片表Schema
+ */
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+var PatchPhotoSchema = new mongoose.Schema({
+	patchId:Number,                              //批次Id,由客户端生成;格式为:当前时间戳+4位随机数.
+	albumId:String,                              //相册objectId
+	albumName:String,                            //相册名字
+	creatorOpenId:String,                        //创建者openid
+	creatorName:String,                          //创建者昵称
+	creatorHeadPic:String,                       //创建者头像
+	description:String,                          //说点什么
+	photos:Array,                                //图片
+	likes: Schema.Types.Mixed,                   //点赞者.数组,格式为[{openId:xxxx,nickName:xxx}]
+	comments:Schema.Types.Mixed,                 //评论..数组,格式为[{openId:xxxx,nickName:xxx,comment:xxxx}]
+	createTime:Number,                           //创建时间
+});
+mongoose.model('PatchPhoto', PatchPhotoSchema);

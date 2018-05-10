@@ -1,0 +1,97 @@
+{
+  "title":"权限数组",
+  "data":[
+    {
+      "id": "1",
+      "name": "联合站数据报表",
+      "url": "index",
+      "icon":"ios-home"
+    },
+    {
+      "id": 7,
+      "name": "中心站",
+      "url": "manageSite",
+      "icon":"settings"
+    },
+    {
+      "id": 2,
+      "name": "站点管理",
+      "icon":"social-buffer",
+      "subItems": [
+        {
+          "id": "2-1",
+          "url": "2-1&siteEnter",
+          "name": "站点数据录入"
+        },
+        {
+          "id": "2-2",
+          "url": "2-2&siteIndex",
+          "name": "站点数据报表"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "井组管理",
+      "icon":"ios-color-filter",
+      "subItems": [
+        {
+          "id": "3-1",
+          "url": "3-1&wellGroupEnter",
+          "name": "井组数据录入"
+        },
+        {
+          "id": "3-2",
+          "url": "3-2&wellGroupIndex",
+          "name": "井组数据报表"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "单井管理",
+      "icon":"ios-grid-view",
+      "subItems": [
+        {
+          "id": "4-1",
+          "url": "4-1&wellEnter",
+          "name": "单井数据录入"
+        },
+        {
+          "id": "4-2",
+          "url": "4-2&wellIndex",
+          "name": "单井数据报表"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "用户管理",
+      "url": "user",
+      "icon":"person-stalker"
+    },
+    {
+      "id": 8,
+      "name": "异常数据展示",
+      "url": "abnormal",
+      "icon":"ios-pricetags"
+    },
+    {
+      "id": 6,
+      "name": "设置",
+      "icon":"gear-b",
+      "subItems": [
+        {
+          "id": "6-1",
+          "url": "6-1&sitParam",
+          "name": "参数设置"
+        },
+        {
+          "id": "6-2",
+          "url": "6-2&recode",
+          "name": "密码修改"
+        }
+      ]
+    }
+  ]
+}

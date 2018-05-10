@@ -1,0 +1,104 @@
+@charset "utf-8";
+body {
+    background-color: #fff;
+    font-family: "微软雅黑";
+    margin: 0;
+    padding: 0;
+}
+a {
+    text-decoration: none;
+}
+em, i {
+    font-style: normal;
+}
+
+.whiteheader{
+    width: 100%;
+    height: 90px;
+    line-height: 90px;
+    background-color: #ffea77;
+    text-align: center;
+}
+.header_back_w{
+    width: 24px;
+    height: 40px;
+    background-image: url(../img/back_b.png);
+    background-size: 24px 40px;
+    background-repeat: no-repeat;
+    position: absolute;
+    top: 30px;
+    left: 28px;
+}
+.header_title_w{
+    margin: 0 auto;
+    color: #010101;
+    font-size: 36px;
+}
+.center_contet{
+    text-align: center;
+    position: relative;
+}
+.box_content{
+    display: -webkit-box;
+}
+.box_content>div{
+    text-align: center;
+    width: 0;
+    -webkit-box-flex: 1;
+}
+.level_bg{
+    width: 80%;
+    margin-top: 45px;
+    position: relative;
+}
+.level_text{
+    font-size: 30px;
+    color: #fff;
+    position: relative;
+    bottom: 155px;
+}
+.ui-progress {
+    overflow: hidden;
+    width: 80%;
+    display: inline-block;
+    height: 28px;
+    font-size: 0;
+    border-radius: 20px;
+    background-color: #fff;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid #ffb878;
+}
+.ui-progress span {
+    text-indent: 1em;
+    color: #fff;
+    display: block;
+    width: 0;
+    background: #ffe16a;
+    height: 100%;
+    font-size: 20px;
+}
+.cgrey{
+    color: #aeb2b4;
+    font-size: 24px;
+}
+.cimg{
+    width: 80px;
+    height: 80px;
+}
+.cred{
+    color: #ff8181;
+}
+.fenge {
+    color: #aeb2b4;
+    font-size: 24px;
+    text-align: center;
+    padding: 10px 0;
+}
+.fenge hr {
+    width: 20%;
+    display: inline-block;
+    position: relative;
+    top: 6px;
+    background-color: #aeb2b4;
+}

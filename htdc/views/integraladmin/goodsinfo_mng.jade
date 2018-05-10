@@ -1,0 +1,164 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    link(rel='stylesheet', type='text/css', href='/js/wangEditor/dist/css/wangEditor.min.css')
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="goodsAdd" ng-controller="goodsAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 编辑商品详情
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/integraladmin/updategoodsinfo')
+                            .form-group
+                                label.control-label.col-lg-2 商品详情
+                                .col-lg-10
+                                    !{content}
+                            .form-group
+                                label.control-label.col-lg-2(for='tuWenTextArea') 重新编辑
+                                .col-lg-10
+                                    textarea#tuWenTextArea.form-control(rows='40',name="goodsInfo",style="resize: none;",minlength=10,maxlength=5000)
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    input#goodsid.default(type='hidden',value="#{data._id}",name="goodsid")
+                                    button.btn.btn-primary(type='subtype',data-ng-click="submitform()") 提交
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    //script(src='/js/jquery-1.10.2.min.js')
+    script(type='text/javascript').
+        //创建富文本
+        var editor = new wangEditor('tuWenTextArea');
+        // 普通的自定义菜单
+        editor.config.menus = [
+            'source',
+            'bold',
+            'underline',
+            'italic',
+            'strikethrough',
+            'eraser',
+            'forecolor',
+            'bgcolor',
+            'quote',
+            'fontfamily',
+            'fontsize',
+            'head',
+            'unorderlist',
+            'orderlist',
+            'alignleft',
+            'aligncenter',
+            'alignright',
+            'link',
+            'unlink',
+            'table',
+            'emotion',
+            'img',
+            'video',
+            'insertcode',
+            'undo',
+            'redo',
+            'fullscreen'
+        ];
+
+        editor.config.uploadImgFns.onload = function (url, xhr) {
+            // resultText 服务器端返回的text
+            // xhr 是 xmlHttpRequest 对象，IE8、9中不支持
+
+            // 上传图片时，已经将图片的名字存在 editor.uploadImgOriginalName
+            var originalName = editor.uploadImgOriginalName || '';
+
+            // 如果 resultText 是图片的url地址，可以这样插入图片：
+            editor.command(null, 'insertHtml', '<img src="' + url + '" alt="' + originalName + '" style="max-width:100%;"/>');
+            // 如果不想要 img 的 max-width 样式，也可以这样插入：
+            // editor.command(null, 'InsertImage', resultText);
+        };
+        // 上传图片（举例）
+        editor.config.uploadImgUrl = '/1.0/pic/wangeditor_uploadimages';
+        editor.config.menuFixed = true;
+        editor.config.zindex = 20000;
+
+        // 设置 headers（举例）
+        editor.config.uploadHeaders = {
+            'Accept': 'text/x-json'
+        };
+
+        editor.create();
+
+
+
+

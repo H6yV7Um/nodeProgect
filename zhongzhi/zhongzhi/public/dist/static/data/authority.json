@@ -1,0 +1,30 @@
+{
+  "title":"权限数组",
+  "data":[
+    {
+      "id": 1,
+      "name": "种质信息管理",
+      "url": "germplasm",
+      "icon":"clipboard"
+    },
+    {
+      "id": 2,
+      "name": "用户管理",
+      "url": "users",
+      "icon":"ios-people"
+    },
+    {
+      "id": 3,
+      "name": "审核管理",
+      "url": "check",
+      "icon":"bug"
+    },
+    {
+      "id":4,
+      "name": "修改密码",
+      "url": "recode",
+      "icon":"gear-b"
+    }
+  ]
+}
+

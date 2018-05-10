@@ -1,0 +1,14 @@
+/**
+ * 相册用户表。存储允许查看某个相册的用户的id信息
+ */
+var mongoose = require("mongoose");
+var Schema = mongoose.Schema;
+var AlbumUserSchema = new mongoose.Schema({
+	albumId:String,
+	userOpenId:String,
+	createTime:Number,
+});
+
+AlbumUserSchema.index({userOpenId: 1});
+
+mongoose.model('AlbumUser', AlbumUserSchema);

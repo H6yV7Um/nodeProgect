@@ -1,0 +1,563 @@
+var express = require('express');
+var router = express.Router();
+var mongoose = require("mongoose");
+var Flock = mongoose.model("Flock");
+var Album = mongoose.model("Album");
+var FlockUser = mongoose.model("FlockUser");
+var FlockAlbum = mongoose.model("FlockAlbum");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var Photo = mongoose.model("Photo");
+var flockHeadPic = require('../common/flockHeadPic');
+var redisClient = require("../common/redisClient");
+var redisPrefix = require("../common/redisPrefix");
+var errors = require("../common/errors");
+var functions = require("../common/functions");
+
+/**
+ *  创建群图集
+ *  */
+router.post('/createflock', function (req, res, next) {
+	var name = req.body.name;
+	var imgIndex = req.body.index;
+	var imgUrl = req.body.filePath;
+	var flock = new Flock({
+		flockName:name,                              //群相册名称
+		flockPicIndex:imgIndex,                                //群头像序号,默认为0,以此递增.若为-1,则表示自定义头像(未来添加)
+		flockPicUrl:imgUrl,                                //群头像
+		creatorOpenId:req.$wxUserInfo.openId,                           //创建者openid
+		creatorName:req.$wxUserInfo.nickName,                           //创建者昵称
+		creatorHeadPic:req.$wxUserInfo.avatarUrl,                          //创建者头像
+		followerNum:0,                             //人气数,默认为0
+		photoNum:0,                                //总照片数
+		openGId:'',                                //群Id
+		linkAlbumNum:0,                            //所包含的联动相册数量
+		undateTime:Date.now(),                              //更新时间，上传/删除照片后，会更新此字段
+		createTime:Date.now(),                     //创建时间
+	});
+	flock.save(function (err, data) {
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			res.status(200).json({
+				error:0,
+				message:'success',
+				data:data,
+			});
+		}
+	})
+});
+
+/**
+ *  获取群头像列表
+ *  */
+router.get('/getflockheadpic', function (req, res, next) {
+	res.status(200).json({
+		error:0,
+		message:'success',
+		data:flockHeadPic,
+	});
+});
+
+
+/**
+ * 用户先创建群组,然后关联群场景
+ */
+router.post("/checkandlinkgroup",function (req,res,next) {
+	var flockId = req.body.flockId;
+	var encryptedData = req.body.encryptedData;
+	var iv = req.body.iv;
+
+	redisClient.get(redisPrefix.WX_SESSION_KEY+req.$wxUserInfo.openId,function (e,v) {
+		if(!v){
+			res.status(200).json(errors.error5);
+		}else{
+			var data = functions.wxDecrypt(encryptedData,iv,v);
+			/**
+			 * data的数据格式为:
+			 * { openGId: 'Gcwf90DevFB_kQCPxbMEpSp3Jzec',
+		 * watermark: { timestamp: 1495096469, appid: 'wxedfda50b98a601f2' } }
+			 * */
+			if (data.openGId){
+				//console.log("分享到群里了");
+				var openGId = data.openGId;
+				Flock.findOne({openGId:openGId},function (e, v) {//查看该群的图集有没有被创建
+					if (e){
+						res.status(200).json(errors.error3);
+					}else {
+						if(v){//该群已创建图集
+							functions.linkUserAndFlock(req.$wxUserInfo.openId,openGId);
+							res.status(200).json(errors.error10001);
+						}else {//关联图集和群
+							Flock.findOneAndUpdate({_id:mongoose.Types.ObjectId(flockId),creatorOpenId:req.$wxUserInfo.openId}, { $set: { openGId: openGId }},{sort:{'undateTime':-1}}, function (err, ret) {
+								if (err){
+									res.status(200).json(errors.error3);
+								}else {
+									functions.linkUserAndFlock(req.$wxUserInfo.openId,openGId);
+									//console.log(ret);
+									res.status(200).json(errors.error0);
+								}
+							});
+						}
+					}
+				});
+			}else {
+				//console.log("未分享到群里了");
+				res.status(200).json(errors.error10002);
+			}
+		}
+
+	});
+});
+
+/**
+ * 用户点击分享到群里的卡片,然后关联群场景
+ */
+router.post("/joinflock",function (req, res, next) {
+	var sourceOpenGId = req.body.sourceOpenGId;
+	var encryptedData = req.body.encryptedData;
+	var iv = req.body.iv;
+
+	redisClient.get(redisPrefix.WX_SESSION_KEY+req.$wxUserInfo.openId,function (e,v) {
+		if(!v){
+			res.status(200).json(errors.error5);
+		}else{
+			var data = functions.wxDecrypt(encryptedData,iv,v);
+			/**
+			 * data的数据格式为:
+			 * { openGId: 'Gcwf90DevFB_kQCPxbMEpSp3Jzec',
+		     * watermark: { timestamp: 1495096469, appid: 'wxedfda50b98a601f2' } }
+			 * */
+			if (data.openGId){
+				//console.log("分享到群里了");
+				var openGId = data.openGId;
+				req.body.targetOpenGId = openGId;
+				if(sourceOpenGId == openGId){//判断源群和目的群是否为同一个群,若为同一个群
+					functions.linkUserAndFlock(req.$wxUserInfo.openId,OpenGId);
+					req.body.cond = 0;
+					next();
+				}else {//若不为同一个群
+					FlockUser.findOne({openId:req.$wxUserInfo.openId, openGId:openGId},function (err,data) {
+						if(err){
+							res.status(200).json(errors.error3);
+						}else {
+							if(data){//判断用户是否是目的群的,若是
+								req.body.cond = 1;
+								next();
+							}else {//若不是
+								req.body.cond = 2;
+								next();
+							}
+						}
+					});
+
+				}
+			}else {
+				//console.log("未分享到群里了");
+				res.status(200).json(errors.error10002);
+			}
+		}
+
+	});
+},function (req, res, next) {
+	var flockInfo = functions.getFlockInfoByOpenGId(req.body.targetOpenGId);
+	Flock.findOne({openGId:req.body.targetOpenGId},function (err, data) {
+		if (err){
+			res.status(200).json(errors.error3)
+		}else {
+			switch (req.body.cond){
+				case 0:             //源群和目的群为同一个群
+				case 1:             //源群和目的群不为同一个群,且用户已绑定目的群
+					res.status(200).json({
+						error:0,
+						message:'success',
+						data:{
+							isJoin:1,
+							flockInfo:flockInfo,
+						}
+					});
+					break;
+				case 2:             //源群和目的群不为同一个群,且用户未绑定目的群
+					res.status(200).json({
+						error:0,
+						message:'success',
+						data:{
+							isJoin:0,
+							flockInfo:flockInfo,
+						}
+					});
+					break;
+			}
+		}
+	});
+
+});
+
+/**
+ * 我的群组列表
+ * 个人首页
+ */
+router.get("/myflocklist",function (req, res, next) {
+	var openId = req.$wxUserInfo.openId;
+	FlockUser.find({openId:openId}, function (err, data) {//查询出我的群id列表
+		if(err){
+			res.status(200).json(errors.error3);
+		} else {
+			var ids = [];
+			for(var i in data){
+				ids.push(data[i].openGId);
+			}
+			Flock.find({openGId:{$in:ids}}).sort({'undateTime':-1}).exec(function (err1,data1) {//查询出群详细信息
+				if (err1){
+					res.status(200).json(errors.error3);
+				} else {
+					var ret = {
+						error:0,
+						message:"success",
+						data:{
+							flocks:data1,
+							user:req.$wxUserInfo,
+						}
+					};
+					res.status(200).json(ret);
+					//console.log(data1);
+				}
+			});
+		}
+	});
+});
+
+/**
+ * 获取群组的更多动态
+ */
+router.get("/getdynimics/:openGId/:page",function (req, res,next) {
+	var openGId = req.params.openGId;
+	var page = req.params.page;
+
+	Flock.findOne({openGId:openGId},function (err, flock) {
+		if (!err){
+			if(flock){
+				//查询和本群相关的相册
+				FlockAlbum.find({flockId:flock._id},function (err1, docs1) {
+					if (!err1 && docs1){
+						var ids = [];
+						var albumIds = [];
+						for( var i in docs1){
+							ids.push(mongoose.Types.ObjectId(docs1[i].albumId));
+							albumIds.push(docs1[i].albumId);
+						}
+						var start = (parseInt(page) - 1) * 10;
+						/*获取新的10条动态*/
+						PatchPhoto.find({albumId:{$in:albumIds}}).sort({'createTime':-1}).skip(start).limit(10).exec(function(err3,docs3){
+							if (!err3 && docs3){
+								var isFinish = 0;
+								if (docs3.length < 10){
+									isFinish =1;
+								}
+								res.status(200).json({
+									error:0,
+									message:"success",
+									data:{
+										isFinish:isFinish,
+										dynimics:docs3,
+									}
+								});
+							}else {
+								res.status(200).json(errors.error3);
+							}
+						});
+					}else {
+						res.status(200).json(errors.error3);
+					}
+				});
+			}else {
+				res.status(200).json(errors.error8);
+			}
+		}else {
+			res.status(200).json(errors.error3);
+		}
+	});
+});
+
+/**
+ * 用户点赞
+ */
+router.post("/userlike",function (req, res, next) {
+	var patchId = req.body.patchId;
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+	PatchPhoto.update({patchId:patchId}, {$addToSet:{likes:{openId:openId,nickName:nickName}}},function(err,data){
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 用户取消点赞
+ */
+router.post("/usercancellike",function (req, res, next) {
+	var patchId = req.body.patchId;
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+	PatchPhoto.update({patchId:patchId}, {$pull:{likes:{openId:openId,nickName:nickName}}},function(err,data){
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 用户点赞
+ */
+router.post("/usercomment",function (req, res, next) {
+	var patchId = req.body.patchId;
+	var comment = req.body.comment;
+
+	var openId = req.$wxUserInfo.openId;
+	var nickName = req.$wxUserInfo.nickName;
+
+	PatchPhoto.update({patchId:patchId}, {$addToSet:{comments:{openId:openId,nickName:nickName,comment:comment}}},function(err,data){
+		if(err){
+			res.status(200).json(errors.error3);
+		}else{
+			res.status(200).json(errors.error0);
+		}
+	});
+});
+
+/**
+ * 获取群详细信息
+ */
+router.get("/flockinfo/:openGId/:openId",function (req, res, next) {
+	var openId = req.params.openId;
+	var openGId = req.params.openGId;
+
+	if (openId == req.$wxUserInfo.openId){
+		functions.getFlockInfoByOpenGId(openGId,function (err,flockInfo) {
+			res.status(200).json({
+				error:0,
+				message:"success",
+				data:flockInfo,
+			});
+		});
+	}else{
+		res.status(200).json(errors.error8);
+	}
+});
+
+/**
+ * 修改群图集名称,头像
+ */
+router.post("/editflock",function (req, res, next) {
+	var openGId = req.body.openGId;
+	var creatorOpenId = req.body.creatorOpenId;
+	var name = req.body.name;
+	var imgIndex = req.body.index;
+	var imgUrl = req.body.filePath;
+
+	if (creatorOpenId == req.$wxUserInfo.openId){
+		var data = {
+			flockName:name,                              //群相册名称
+			flockPicIndex:imgIndex,                      //群头像序号,默认为0,以此递增.若为-1,则表示自定义头像(未来添加)
+			flockPicUrl:imgUrl,                          //群头像
+		};
+		Flock.update({openGId:openGId},data,function (err,ret) {
+			if(err){
+				res.status(200).json(errors.error3);
+			}else {
+				//刷新群缓存
+				functions.buildFlockInfoCache(openGId,function (e,v) {});
+				res.status(200).json(errors.error0);
+			}
+		});
+	}else{
+		res.status(200).json(errors.error8);
+	}
+});
+
+/**
+ * 查看群全部相册
+ */
+router.get("/allalbums/:openGId/:openId",function(req, res, next){
+	if (req.params.openId == req.$wxUserInfo.openId){
+		FlockAlbum.find({openGId:req.params.openGId},function (err, data) {
+			//console.log(data);
+			if(err){
+				res.status(200).json(errors.error3);
+			} else {
+				var ids = [];
+				for (var i in data){
+					ids.push(mongoose.Types.ObjectId(data[i].albumId));
+				}
+				Album.find({_id:{$in:ids}},function (err1,data1) {
+					//console.log(data1);
+					if(err1){
+						res.status(200).json(errors.error3);
+					} else {
+						res.status(200).json({
+							error:0,
+							message:"success",
+							data:data1,
+						});
+					}
+				})
+			}
+		})
+	} else {
+		res.status(200).json(errors.error8);
+	}
+});
+
+/**
+ * 群添加相册
+ */
+router.post("/addflockalbum",function (req, res, next) {
+	var openGId = req.body.openGId;
+	var openId = req.body.openId;
+	var name = req.body.name;
+	var description = req.body.description;
+	var price = req.body.price;
+	if (openId == req.$wxUserInfo.openId){
+		var album = new Album({
+			coverPic:'',                                //封面图片
+			creatorOpenId:req.$wxUserInfo.openId,                           //创建者openid
+			creatorName:req.$wxUserInfo.nickName,                             //创建者昵称
+			creatorHeadPic:req.$wxUserInfo.avatarUrl,                          //创建者头像
+			albumName:name,                               //相册名称
+			albumDescription:description,                        //相册描述
+			isLinkAlbum:0,                             //是否是联动相册.0不是,是群相册;1是
+			price:price,                                   //价格（元）
+			photoNum:0,                                //照片数量,默认为0
+			createTime:Date.now(),                              //创建时间
+			updateTime:Date.now(),                              //更新时间
+		});
+		album.save(function (err, data) {
+			if(err){
+				res.status(200).json(errors.error3);
+			}else {
+				//关联群与相册
+				var fa = new FlockAlbum({
+					openGId:openGId,                                 //群的openId
+					albumId:data._id,                                 //相册objectId
+					createTime:Date.now(),                              //关联时间
+				});
+				fa.save(function(err1,data1){});
+				res.status(200).json({
+					error:0,
+					message:'success',
+					data:data,
+				})
+			}
+		})
+	}else {
+		res.status(200).json(errors.error8);
+	}
+});
+
+/**
+ * 获得我创建的相册列表
+ */
+router.get("/myflockalbums/:openGId",function (req, res, next) {
+	var openId = req.$wxUserInfo.openId;
+	var openGId = req.params.openGId;
+
+	FlockAlbum.find({openGId:openGId},function (err, data) {
+		if(err){
+			res.status(200).json(errors.error3);
+		}else {
+			var ids = [];
+			for (var i in data){
+				ids.push(mongoose.Types.ObjectId(data[i].albumId));
+			}
+			Album.find({_id:{$in:ids},creatorOpenId:openId},function (err1,data1) {
+				if (err1){
+					res.status(200).json(errors.error3);
+				}else {
+					res.status(200).json({
+						error:0,
+						message:'success',
+						data:data1,
+					})
+				}
+			})
+		}
+	})
+});
+/**
+ * 上传图片到群图集
+ */
+router.post("/addphoto2flockalbum",function (req, res, next) {
+
+});
+
+
+router.get('/allflocks', function (req, res, next) {
+	Flock.find({},function (e,v) {
+		res.json(v);
+	})
+});
+
+
+router.get('/allflockusers', function (req, res, next) {
+	FlockUser.find({},function (e,v) {
+		res.json(v);
+	})
+});
+
+router.get('/test', function (req, res, next) {
+	Flock.find({},function (e,v) {
+		res.json(v);
+	});
+
+	/*redisClient.get(redisPrefix.FLOCK_HOME_DATA_BY_OPEN_GROUP_ID+'Gcwf90DevFB_kQCPxbMEpSp3Jzec',function (e,v) {
+		if(!e && v){
+			res.json(v);
+		}else {
+			res.json('cuo');
+		}
+	})*/
+});
+
+router.get('/test1', function (req, res, next) {
+	FlockAlbum.find({},function (e,v) {
+		res.json(v);
+	});
+});
+
+router.get('/test2', function (req, res, next) {
+	Album.find({},function (e,v) {
+		res.json(v);
+	});
+});
+
+router.get('/test4', function (req, res, next) {
+	FlockUser.find({},function (e,v) {
+		res.json(v);
+	});
+});
+
+router.get('/test5', function (req, res, next) {
+	PatchPhoto.find({},function (e,v) {
+		res.json(v);
+	});
+});
+
+router.get('/test6', function (req, res, next) {
+	Photo.find({},function (e,v) {
+		res.json(v);
+	});
+});
+
+router.get('/test7', function (req, res, next) {
+	res.json(req.ip);
+});
+
+module.exports = router;

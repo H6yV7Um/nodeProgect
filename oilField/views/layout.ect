@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <% content 'title' %>
+
+  <link rel="shortcut icon" href="/img/favicon.ico" type="image/x-icon" />
+  <link rel="icon" href="/img/favicon.ico">
+  <link rel="stylesheet" href="/css/bootstrap.css">
+  <link rel="stylesheet" href="/css/public.css">
+  <script src="/js/jquery-2.1.1.min.js"></script>
+
+</head>
+
+<body>
+<div class="cont">
+	<a href="/gl" style="position: fixed;color: #fff;right: 30px;bottom: 15px;opacity: .6;text-decoration: none">进入管理></a>
+	<div class="total">
+		<div class="head">
+		  <img src="/img/logo.png" alt="" class="logo">
+		  <p>
+			薛岔采油区大数据分析平台
+		  </p>
+		  <nav data-active="<%= @activeArea %>">
+			<div class="at1">
+			  <a href="/">总览</a>
+			</div>
+			<div class="at2">
+			  <a href="/site">站点</a>
+			</div>
+			<div class="at3">
+			  <a href="/wellGroup">井组</a>
+			</div>
+			<div class="at4">
+			  <a href="well">井</a>
+			</div>
+		  </nav>
+		</div>
+		<div class="head-samll">
+		  <img src="/img/logo.png" alt="" class="logo">
+			<nav data-active="<%= @activeArea %>">
+				<div class="at1">
+					<a href="/">总览</a>
+				</div>
+				<div class="at2">
+					<a href="/site">站点</a>
+				</div>
+				<div class="at3">
+					<a href="/wellGroup">井组</a>
+				</div>
+				<div class="at4">
+					<a href="well">井</a>
+				</div>
+			</nav>
+		  <p>
+			薛岔采油区大数据分析平台
+		  </p>
+		</div>
+  <% content 'content' %>
+  </div>
+</div>
+
+<script src="http://pv.sohu.com/cityjson?ie=utf-8"></script>
+<SCRIPT>
+    whatBrowser()
+    function whatBrowser()
+    {
+//            document.Browser.Name.value=navigator.appName;
+//            document.Browser.Version.value=navigator.appVersion;
+//            document.Browser.Code.value=navigator.appCodeName;
+//            document.Browser.Agent.value=navigator.userAgent;
+        console.log(navigator.appName)
+        console.log(navigator.appVersion.split(";")[1].replace(/[ ]/g,""))
+        if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE6.0")
+        {
+            alert('你的浏览器版本过低，建议使用谷歌浏览器浏览本页面！');
+        }
+        else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE7.0")
+        {
+            alert('你的浏览器版本过低，建议使用谷歌浏览器浏览本页面！');
+        }
+        else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE8.0")
+        {
+            console.log("ie8")
+            $("#myNav").hide()
+            $("#canvasArea").hide()
+            alert('你的浏览器版本过低，建议使用谷歌浏览器浏览本页面！');
+        }
+        else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE9.0")
+        {
+            alert('你的浏览器版本过低，建议使用谷歌浏览器浏览本页面！');
+        }else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE10.0"){
+            alert('建议使用谷歌浏览器使用本系统！');
+        }else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.split(";")[1].replace(/[ ]/g,"")=="MSIE11.0") {
+            alert('建议使用谷歌浏览器使用本系统！');
+        }else{
+            if (window.navigator.userAgent.indexOf('compatible') != -1) {
+                alert('请切换到浏览器急速模式进行浏览！');
+            }
+            if(window.navigator.userAgent.indexOf('AppleWebKit') != -1) {
+                //alert('360极速模式');
+            }
+        }
+    }
+</SCRIPT>
+<script>
+    var activeArea = $("nav").attr("data-active");
+    switch (activeArea) {
+        case '1':
+            $(".at1").addClass("active");
+            break;
+        case '2':
+            $(".at2").addClass("active");
+            break;
+        case '3':
+            $(".at3").addClass("active");
+            break;
+        case '4':
+            $(".at4").addClass("active");
+            break;
+        default:
+            $(".at1").addClass("active");
+    }
+
+    var city =returnCitySN['cname']
+    var ip=returnCitySN['cip']
+	$.get('/weather/'+ip,function (data) {
+		var today=data.result.today
+		$('.tempNum').html(today.temperature)
+		$('.stats').html(today.weather)
+		$('.wind').html(today.wind)
+		$('.date').html(today.date_y)
+    })
+</script>
+
+</body>
+</html>

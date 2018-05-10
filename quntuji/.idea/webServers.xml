@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="71407555-305a-46de-87a1-c31673188974" name="群图集" url="http://122.152.201.162">
+        <fileTransfer host="122.152.201.162" port="22" rootFolder="/data/www/quntuji" accessType="SFTP" password="dfecdfc7df9bdf93df92df9ddf9adf98df9adf99" username="root">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

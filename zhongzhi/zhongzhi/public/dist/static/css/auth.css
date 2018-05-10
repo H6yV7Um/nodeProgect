@@ -1,0 +1,458 @@
+@charset "utf-8";
+body{
+    font-family: "微软雅黑"
+}
+.authTop:after{
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+.authLeft,.authRight{
+    float: left;
+}
+.authImg{
+    width: 200px;
+    height:200px;
+}
+.authRight{
+    margin-left: 30px;
+    line-height: 1;
+    max-width: 600px;
+}
+.authTitle{
+    font-size: 30px;
+    color: #6b6b6b;
+}
+.authDes{
+    font-size: 14px;
+    margin-top: 30px;
+    color: #6b6b6b;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 750px;
+    text-overflow: ellipsis;
+}
+.authPrice{
+    font-size: 14px;
+    margin-top: 30px;
+    color: #d2d2d2;
+}
+.authPrice span{
+    font-size: 22px;
+    color: #fbb33a;
+}
+.authSel{
+    font-size: 14px;
+    margin-top: 30px;
+    color: #d2d2d2;
+    position: relative;
+}
+.authSel span{
+    float: left;
+}
+.clear{
+    clear: both;
+}
+.authSel ul{
+    list-style: none;
+    display: inline-block;
+    max-width: 520px;
+    max-height: 40px;
+    overflow: hidden;
+}
+.authSel li{
+    list-style: none;
+    display: inline-block;
+    float: left;
+    margin-right: 30px;
+}
+.authSelRad{
+    display: none;
+}
+.authSelRad + label{
+    display: inline-block;
+    font-size: 14px;
+    color: #ada9a9;
+    border: 1px solid #ada9a9;
+    background-color: transparent;
+    width: 150px;
+    text-align: center;
+    height:46px;
+    line-height: 46px;
+}
+.authSelRad:checked + label{
+    color: #fff;
+    border: 1px solid #fbb33a;
+    background-color: #fbb33a;
+}
+.authBtn{
+    position: absolute;
+    right: 0;
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+.authBtn p{
+    font-size: 12px;
+    margin-top: 5px;
+}
+.authCnt{
+
+}
+.authCntT{
+    font-size: 16px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+    padding: 10px 0;
+}
+.authCntC{
+    border: 1px solid #eee;
+    padding: 20px;
+}
+.authCntTT{
+    font-size: 16px;
+    margin: 10px 0;
+    color: #171717;
+}
+.authCntTC{
+    font-size: 12px;
+    margin: 10px 0;
+}
+.authCntTC span{
+    color: #F0AD4E;
+}
+.authCntTT span{
+    color: #F0AD4E;
+}
+.orangeBg{
+    background-color: #f7b039;
+}
+.greenBg{
+    background-color: #3cd68a;
+}
+.purpleBg{
+    background-color: #b0a2f8;
+}
+.blueBg{
+    background-color: #38c6fb;
+}
+.yellowBg{
+    background-color: #fff6c9;
+}
+.redBg{
+    background-color: #fb3894;
+}
+.whiteT{
+    text-align: center;
+    color: #fff;
+}
+.pd20{
+    padding: 20px 0;
+}
+.mar20{
+    margin: 20px;
+    border-radius: 10px;
+}
+.authColP3{
+    color: #fff;
+    display: inline-block;
+    border: 1px solid #fff;
+    margin-top: 3px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+
+.quotationTable{
+    width: 100%;
+    text-align: center;
+    border-collapse:collapse;
+    margin-top: 20px;
+    font-size: 14px;
+}
+.greyBg{
+    background-color: #f2f2f2;
+}
+.quotationTable td{
+    border: 1px solid #e6e6e6;
+    height: 40px;
+    line-height: 40px;
+}
+.myRadio{
+    display: none;
+}
+.myRadio + label{
+    width: 100%;
+    height: 46px;
+    line-height: 46px;
+    margin-bottom: 0;
+    background-color: #fff;
+}
+.myRadio:checked + label{
+    background-color: #bebebe;
+    color: #fff;
+}
+.mar40{
+    margin: 40px;
+}
+.center{
+    text-align: center;
+}
+.mySubBtn{
+    outline: none;
+    border: 1px solid #fbb238;
+    color: #fff;
+    background-color: #fbb238;
+    padding: 10px 150px;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: all .5s;
+}
+.myInsideBtn{
+    display: inline-block;
+    outline: none;
+    border: 1px solid #fbb238;
+    color: #fff;
+    background-color: #fbb238;
+    border-radius: 5px;
+    padding: 0 30px;
+    height: 36px;
+    line-height:36px;
+    transition: all .5s;
+}
+.mySubBtnChart{
+    outline: none;
+    color: #fff;
+    background-color: #fbb238;
+    width: 100%;
+    border: 1px solid #fbb238;
+}
+.mySubBtn:hover,.myInsideBtn:hover,.mySubBtnChart:hover{
+    color: #fbb238;
+    background-color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+}
+.mySubBtn:active,.myInsideBtn:active,.mySubBtnChart:active{
+    opacity: 0.7;
+    color: #fff;
+}
+.mySubBtn:focus,.myInsideBtn:focus,.mySubBtnChart:focus{
+    color: #fff;
+}
+.mar27{
+    margin: 20px 70px;
+}
+.pad20{
+    padding: 20px;
+}
+.marT20{
+    margin-top:20px;
+}
+.payTitle{
+    height: 65px;
+    line-height: 65px;
+}
+.titleLeft{
+    font-size: 16px;
+}
+.titleRight:after{
+    content: "";
+    display: block;
+    width: 10;
+    visibility: hidden;
+    clear: both;
+}
+.titleRight{
+    position: absolute;
+    right: 50px;
+    line-height: 1;
+}
+.stepArea{
+    float: left;
+    text-align: center;
+}
+.step{
+    display: inline-block;
+    color: #b5b3b3;
+    border: 2px solid #b5b3b3;
+    background-color: transparent;
+    width: 40px;
+    line-height: 40px;
+    height: 40px;
+    border-radius: 200px !important;
+}
+.stepDes{
+    color: #b5b3b3;
+    font-size: 14px;
+    margin-top: 10px;
+}
+.myHr{
+    float: left;
+    display: inline-block;
+    width: 100px;
+    border-color: #b5b3b3;
+    border-bottom: 1px solid #b5b3b3;
+}
+.step1{
+    position: relative;
+    left: 9px;
+}
+.step3{
+    position: relative;
+    right: 9px;
+}
+.hr3{
+    position: relative;
+    right: 18px;
+}
+.step4{
+    position: relative;
+    right: 9px;
+}
+.step5{
+    position: relative;
+    right: 27px;
+}
+.stepActive .step{
+    color: #fff;
+    background-color: #f7b039;
+    border: 2px solid #f7b039;
+}
+.stepActive .stepDes{
+    color: #f7b039;
+}
+.hrActive{
+    border-color: #f7b039;
+    border-bottom: 1px solid #f7b039;
+}
+.tlr{
+    text-align: right;
+    height: 80px;
+    line-height: 80px;
+}
+.payBtn{
+    display: inline-block;
+    color: #fbb33a;
+    border: 1px solid #b5b3b3;
+    font-size: 16px;
+    width: 200px;
+    text-align: center;
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+}
+.payBtn:hover{
+    text-decoration: none;
+    color: #fff;
+    border: 1px solid #fbb33a;
+    background-color: #fbb33a;
+}
+.payArea{
+    color: #171717;
+    margin-right: 40px;
+}
+.moneyArea{
+    color: #fbb33a;
+    font-size: 20px;
+}
+.titleLeft img{
+    width: 30px;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+.payTipImg{
+    width: 130px;
+}
+.payTipText{
+    margin-top: 30px;
+    font-size: 16px;
+    color: #000;
+}
+.f14{
+    font-size: 14px;
+    color: #5b5b59;
+}
+.disabled{
+    background-color: #b9b8b8;
+    border: 1px solid #b9b8b8;
+    cursor: wait;
+}
+.disabled:hover{
+    background-color: #b9b8b8;
+    color: #fff;
+    border: 1px solid #b9b8b8;
+}
+.borderNone{
+    border: none !important;
+}
+.orangeT{
+    color: #f7b039 !important;
+}
+.packageInfo>div label{
+    position: relative;
+}
+.rate{
+    position: absolute;
+    display: inline-block;
+    width: 46px;
+    color: #fff;
+    font-size: 12px;
+    padding-right: 4px;
+    right: 0;
+    top: 0;
+    background: linear-gradient(53deg,rgba(0,0,0,0) 12px,red 9px);
+    text-align: right;
+    line-height: 17px;
+}
+.btn.changeAppSecret{
+    color: #fff;
+    background-color: #f7b039;
+    border-color: #f7b039;
+    position: absolute;
+    top: 130px;
+    right: 70px;
+    outline: none;
+}
+.btn.changeAppSecret:hover{
+    color: #f7b039;
+    background-color: #fff;
+    border-color: #f7b039;
+    outline: none;
+}
+.m-bot15.i-width {
+    width: 56%;
+}
+.m-bot15.sh-number{
+    position: relative;
+}
+.warningBar{
+    background: #fff;
+    color: #000;
+    font-weight: bold;
+    border: 2px solid red;
+    -webkit-box-shadow: 0 2px 8px #999;
+    -moz-box-shadow: 0 2px 8px #999;
+    box-shadow: 0 2px 8px #999;
+    width: 50%;
+    box-sizing: border-box;
+    padding: 10px;
+    position: absolute;
+    top: -10px;
+    right: -50%;
+}
+.trangle {
+    width: 12px;
+    height: 12px;
+    border-bottom: 2px solid red;
+    border-left: 2px solid red;
+    background: #fff;
+    transform: rotate(45deg);
+    position: absolute;
+    top: 12px;
+    right: -6px;
+    -webkit-box-shadow:-1px 2px #ddd;
+    -moz-box-shadow: -1px 2px #ddd;
+    box-shadow: -1px 2px #ddd;
+}

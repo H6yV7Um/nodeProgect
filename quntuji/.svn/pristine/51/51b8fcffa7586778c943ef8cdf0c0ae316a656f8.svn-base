@@ -1,0 +1,34 @@
+/**
+ * vip 等级权限/价格设置
+ * 说明:
+ * price:价格(元/月)
+ * picLimit:联动相册最大上传图片数
+ * albumLimit:联动相册最大可创建相册数
+ * flockLimit:联动相册最多可关联图集数
+ */
+module.exports = {
+	vip0 : {
+		price: 0,
+		picLimit:10,
+		albumLimit:1,
+		flockLimit:2,
+	},
+	vip1 : {
+		price: 10,
+		picLimit:50,
+		albumLimit:5,
+		flockLimit:10,
+	},
+	vip2 : {
+		price: 25,
+		picLimit:200,
+		albumLimit:20,
+		flockLimit:40,
+	},
+	vip3 : {
+		price: 50,
+		picLimit:1000,
+		albumLimit:100,
+		flockLimit:200,
+	},
+}

@@ -1,0 +1,27 @@
+{
+  "name": "kp",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
+    "debug": "~2.6.9",
+    "ect": "^0.5.9",
+    "express": "~4.15.5",
+    "formidable": "^1.2.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.0",
+    "jade": "~1.11.0",
+    "md5": "^2.2.1",
+    "mongoose": "^4.11.1",
+    "mongoose-auto-increment": "^5.0.1",
+    "morgan": "~1.9.0",
+    "node-xlsx": "^0.12.0",
+    "request": "^2.85.0",
+    "serve-favicon": "~2.4.5"
+  }
+}

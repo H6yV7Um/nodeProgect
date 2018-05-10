@@ -1,0 +1,170 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 120px;
+            height: 100px;
+        }
+
+        .arrow-up {
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-bottom: 6px solid #7a7676;
+        }
+
+        .arrow-down {
+            margin-top: 2px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #7a7676;
+        }
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+
+
+
+block content
+    div(data-ng-app="myApp",data-ng-controller="pageCtrl")
+        .row
+            .col-md-12
+                section.panel
+                    header.panel-heading.custom-tab.turquoise-tab
+                        ul.topMoreNav.nav.nav-tabs
+                            li
+                                a(href='#') 查看政策&nbsp({{num}})
+        //搜索框
+        .row
+            .col-lg-4.col-lg-offset-8(style="position: relative;top:10px;")
+                form
+                    .form-group
+                        label.col-sm-3.control-label.col-lg-3
+                        .col-lg-9
+                            a.btn.btn-info(href="/policyadmin/addpolicy/#{policyclassid}") 添加政策
+        .row
+            .panel-body
+                .tab-content
+                    #onShelvesGoods.tab-pane.active
+                        section.panel
+                            .panel-body
+                                section#unseen
+                                    table.table.table-bordered.table-striped.table-condensed
+                                        thead
+                                            tr
+                                                th 标题
+                                                th 内容
+                                                th 链接地址
+                                                //th 操作
+                                                th 删除
+                                        tbody
+                                            tr(data-ng-repeat="x in items")
+                                                td  {{x.title}}
+                                                td  {{x.content}}
+                                                td  {{x.url}}
+                                                //td
+                                                //    a(href="/cshopadmin/cshopinfo/{{x._id}}",class="btn btn-info btn-xs lookImgtextBtn") 编辑
+                                                td
+                                                    //a(href = "/goodsadmin/deletegoods/{{x._id}}",class="btn btn-warning btn-xs lookImgtextBtn") 删除
+                                                    a(href="#myModal{{$index}}",data-toggle="modal",class="btn btn-warning btn-xs") 删除
+                                                    .modal.fade(aria-hidden='true', aria-labelledby='myModalLabel', role='dialog', tabindex='-1',id="myModal{{$index}}")
+                                                        .modal-dialog
+                                                            .modal-content
+                                                                .form
+                                                                    form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/policyadmin/delete')
+                                                                        .modal-header
+                                                                            button.close(aria-hidden='true', data-dismiss='modal', type='button') ×
+                                                                            h4.modal-title 确认删除？
+                                                                        .modal-body
+                                                                            //弹出框内容部分
+                                                                            .rejectContent
+                                                                                input#useraccount.form-control(name='policyid',  type='hidden', value='{{x._id}}')
+                                                                        .modal-footer
+                                                                            button.btn.btn-default(type='button', data-dismiss='modal') 取消
+                                                                            button#confirm.btn.btn-warning(type='submit' class="okReject")  确定
+
+
+                                    div
+                                        ul.pagination.pagination-sm
+                                            li
+                                                a(data-ng-click='first()') 首页
+                                            li(data-ng-repeat="page in pagelist" data-ng-class='{active:isactivepage(page)}')
+                                                a(data-ng-click='selectpage(page)') {{page}}
+                                            li
+                                                a(data-ng-click='last()') 尾页
+                                             li
+
+
+
+
+block myScript
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/myJs/page.js')
+    script(type='text/javascript').
+        var pagesize = !{JSON.stringify(pagesize)};
+        var counturl = !{JSON.stringify(counturl)};
+        var dataurl = !{JSON.stringify(dataurl)};
+        page(counturl, dataurl, pagesize);
+        function searcteachers(){
+            var account = $('#searchaccount').val()
+            window.location.href = '/track/searchtracks/'+account
+        }

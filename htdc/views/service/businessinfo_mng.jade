@@ -1,0 +1,270 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="goodsAdd" ng-controller="goodsAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 编辑服务公司
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/serviceadmin/editbusiness')
+                            .form-group
+                                label.control-label.col-lg-2(for='goodsName') 公司名称
+                                .col-lg-10
+                                    input#goodsName.form-control(name='name',  type='text', value='#{data.name}',required='',autofocus='autofocus')
+                            .form-group
+                                label.control-label.col-lg-2(for='price1') 公司地址
+                                .col-lg-10
+                                    input#price1.form-control(name='address',  type='text', value='#{data.address}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price2') 公司联系方式
+                                .col-lg-10
+                                    input#price2.form-control(name='linkPhone',  type='text', value='#{data.linkPhone}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price3') 公司详情
+                                .col-lg-10
+                                    input#price3.form-control(name='serviceInfo',  type='text', value='#{data.serviceInfo}', required='')
+
+                            .form-group
+                                label.control-label.col-lg-2 公司logo
+                                .col-lg-10
+                                    .fileupload.fileupload-new(data-provides='fileupload')
+                                        .fileupload-new.thumbnail(style='width: 180px; height: 183px; position:relative;')
+                                            img#showPictureImg(src="#{data.logo}", alt='')
+                                            #progressbar1(style="height:3px;background:green;width:0%;position:absolute; bottom:0;left:0;")
+
+                                        .fileupload-preview.fileupload-exists.thumbnail(style='width: 180px; height: 180px; line-height: 0px;')
+                                        div
+                                            span.btn.btn-default.btn-file
+                                                span.fileupload-new
+                                                    i.fa.fa-paper-clip
+                                                    |  选择图片
+                                                span.fileupload-exists
+                                                    i.fa.fa-undo
+                                                    |  重选
+                                                input#showPictureInput.default(type='file',value="")
+                                            | &nbsp;&nbsp;
+                                            a.btn.btn-danger.fileupload-exists(href='#', data-dismiss='fileupload')
+                                                i.fa.fa-trash
+                                                |  确定
+                                    input#bannerImgsHidden.default(type='hidden',value="#{data.logo}",name="logo")
+                            .form-group
+                                label.control-label.col-lg-2(for='price3') 服务内容
+                                .col-lg-10
+                                    .tab-content
+                                        #onShelvesGoods.tab-pane.active
+                                            section.panel
+                                                .panel-body
+                                                    section#unseen
+                                                        table.table.table-bordered.table-striped.table-condensed
+                                                            thead
+                                                                tr
+                                                                    th 服务名称
+                                                                    th 服务简介
+                                                                    th 服务价格
+                                                                    th 删除
+                                                            tbody
+                                                                tr(data-ng-repeat="x in items")
+                                                                    td {{x.name}}
+                                                                    td {{x.info}}
+                                                                    td {{x.price}}
+                                                                    td
+                                                                        button.btn.btn-warning(type='button',data-ng-click="delete($index)") 删除
+                                                        button.addservice(style="float:right;background: none;border: 1px solid #ccc; border-radius: 4px; padding: 5px;") 添加服务
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    input#interspaceId.default(type='hidden',value="#{businessid}",name="bussineid")
+                                    input#content.form-control(name='serviceContent',  type='hidden',  required='')
+                                    button.btn.btn-primary(type='button',data-ng-click="submitform()") 提交
+                    .zhezhao(style="width:100%;height:100%;background:rgba(0,0,0,.5);position:fixed;top:0;left:0;display:none")
+                        .form.addserverForm(style="padding:0 20px;position:absolute;left:0;top:0;right:0;bottom:0;margin:auto auto;background:#fff;padding-top:40px;width:600px;height:300px;z-index:50")
+                            form#addservice.cmxform.form-horizontal.adminex-form(method='post',  )
+                                .form-group
+                                    label.control-label.col-lg-2(for='serviceName') 服务名称
+                                    .col-lg-8
+                                        input#serviceName.form-control(name='serviceName',  type='text',required='',autofocus='autofocus')
+                                .form-group
+                                    label.control-label.col-lg-2(for='serviceInfo') 服务简介
+                                    .col-lg-8
+                                        input#serviceInfo.form-control(name='serviceInfo',  type='text', required='')
+                                .form-group
+                                    label.control-label.col-lg-2(for='servicePrice') 服务价格
+                                    .col-lg-8
+                                        input#servicePrice.form-control(name='servicePrice',  type='text',  required='')
+                                .form-group
+                                    .col-lg-offset-2.col-lg-8
+
+                                        button.btn.btn-primary(type='button',data-ng-click="servicesubmit()") 确认
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    script(type='text/javascript', src='/js/wangEditor-2.1.19/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/formValidatorRegex.js')
+    script(type='text/javascript').
+        //var interspaces = !{JSON.stringify(interspaces)}
+        var app = angular.module('goodsAdd', []);
+        app.controller('goodsAddCtrl', function ($scope, $http) {
+            var imgs = !{JSON.stringify(data.goodsImgs)}
+            $scope.bannerImgs = imgs
+
+            data = !{JSON.stringify(data.serviceContent)}
+            $scope.items = data
+
+
+            //移除banner图片
+            $scope.delete = function (index) {
+                data.splice(index, 1);
+            };
+            //提交表单
+            $scope.submitform = function () {
+                $('#content').val(JSON.stringify(data))
+                $('#commentForm').submit();
+
+            }
+            //添加服务提交表单
+            $scope.servicesubmit = function () {
+                $('.zhezhao').hide()
+                if (($('#serviceName').val() != '') && ($('#serviceInfo').val() != '') && ($('#servicePrice').val() != '')) {
+                    var obj = {
+                        name: $('#serviceName').val(),
+                        info: $('#serviceInfo').val(),
+                        price: $('#servicePrice').val()
+                    }
+                    $('#serviceName').val('')
+                    $('#serviceInfo').val('')
+                    $('#servicePrice').val('')
+                    $scope.items.push(obj)
+                }
+
+                //if(imgs.length > 0){
+                //    $('#ImgsHidden').val(JSON.stringify(imgs))
+                //    $('#commentForm').submit();
+                //}else{
+                //    $.scojs_message('请上传轮播图');
+                //}
+            }
+            //添加服务
+            $('button.addservice').click(function (e) {
+                e.preventDefault()
+                $('.zhezhao').show()
+            })
+
+            //上传商品图片
+            $('#showPictureInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar1').css(
+                                'width', '100%'
+                            );
+                            $("#bannerImgsHidden").val(ret.data);
+                            $("#showPictureImg").attr('src', ret.data)
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar1').css(
+                        'width',
+                        progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            });
+        })
+
+
+
+
+

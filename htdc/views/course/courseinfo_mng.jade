@@ -1,0 +1,215 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="courseUpdate" ng-controller="courseUpdateCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 课程修改
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/course/updatecourse')
+                            .form-group
+                                label.control-label.col-lg-2(for='goodsName') 课程名称
+                                .col-lg-10
+                                    input#goodsName.form-control(name='goodsName',  type='text', value='#{data.goodsName}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='startTime')  开课时间
+                                .col-lg-7
+                                    input#startTime.form-control.form_datetime(type="text",value='#{data.start}',name='startTime',placeholder="请输入日期搜索时间",onFocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',alwaysUseStartDate:true})")
+                            .form-group
+                                label.control-label.col-lg-2(for='endTime')  结束时间
+                                .col-lg-7
+                                    input#endTime.form-control.form_datetime(type="text",name='endTime',value='#{data.end}',placeholder="请输入日期搜索时间",onFocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',alwaysUseStartDate:true})")
+                            .form-group
+                                label.control-label.col-lg-2(for='detailPlace') 地址
+                                .col-lg-10
+                                    input#detailPlace.form-control(name='detailPlace',  type='text', value='#{data.detailPlace}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='goodsDescribe') 简介
+                                .col-lg-10
+                                    input#goodsDescribe.form-control(name='goodsDescribe',  type='text',value='#{data.goodsDescribe}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='useInfo') 校验使用说明
+                                .col-lg-10
+                                    input#useInfo.form-control(name='useInfo',  type='text',value='#{data.useInfo}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='goodsInfo') 详细信息
+                                .col-lg-10
+                                    input#goodsInfo.form-control(name='goodsInfo',  type='text',value='#{data.goodsInfo}', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price1') 入驻企业有期权价格
+                                .col-lg-10
+                                    input#price1.form-control(name='price1',  type='text', value='#{data.price1}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price1') 入驻企业无期权价格
+                                .col-lg-10
+                                    input#price2.form-control(name='price2',  type='text', value='#{data.price2}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price3') 普通用户价格
+                                .col-lg-10
+                                    input#price3.form-control(name='price3',  type='text', value='#{data.price3}',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='interspaceId') 所属空间
+                                .col-lg-6
+                                    select#interspaceId.form-control(name="interspaceId",required="")
+                                        option(value='#{data.interspaceId}') #{inter}
+                                        each interspace in interspaces
+                                            option(value='#{interspace._id}') #{interspace.interspaceName}
+                            .form-group
+                                label.control-label.col-lg-2(for='typeId') 所属体系
+                                .col-lg-6
+                                    select#typeId.form-control(name="typeId",required="")
+                                        option(value='#{data.typeId}') #{ttype}
+                                        each system in systems
+                                            option(value='#{system._id}') #{system.name}
+                            .form-group
+                                label.control-label.col-lg-2 图片一
+                                .col-lg-10
+                                    .fileupload.fileupload-new(data-provides='fileupload')
+                                        .fileupload-new.thumbnail(style='width: 180px; height: 183px; position:relative;')
+                                            img#showPictureImg(src="#{data.goodsPic}", alt='')
+                                            #progressbar1(style="height:3px;background:green;width:0%;position:absolute; bottom:0;left:0;")
+
+                                        .fileupload-preview.fileupload-exists.thumbnail(style='width: 180px; height: 180px; line-height: 0px;')
+                                        div
+                                            span.btn.btn-default.btn-file
+                                                span.fileupload-new
+                                                    i.fa.fa-paper-clip
+                                                    |  选择图片
+                                                span.fileupload-exists
+                                                    i.fa.fa-undo
+                                                    |  重选
+                                                input#showPictureInput.default(type='file',value="")
+                                            | &nbsp;&nbsp;
+                                            a.btn.btn-danger.fileupload-exists(href='#', data-dismiss='fileupload')
+                                                i.fa.fa-trash
+                                                |  确定
+                                    input#bannerImgsHidden.default(type='hidden',value="#{data.goodsPic}",name="goodsPic")
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    input#adid.default(type='hidden',value="#{data._id}",name="courseid")
+                                    input#adid1.default(type='hidden',value="#{onet._id}",name="teacherid")
+                                    button.btn.btn-primary(type='subtype',data-ng-click="submitform()") 更新
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    script(type='text/javascript', src='/js/wangEditor-2.1.19/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/formValidatorRegex.js')
+    script(src='/js/datePicker/WdatePicker.js')
+    script(type='text/javascript').
+
+            $('#showPictureInput').fileupload({
+                dataType: 'json',
+                url: '/1.0/pic/uploadimages',
+                acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+                maxFileSize: 2 * 1024 * 1024,
+                previewMaxWidth: 180,
+                previewMaxHeight: 180,
+                previewCrop: true,
+                done: function (e, data) {
+                    var ret = data.result;
+                    switch (ret.error) {
+                        case '0':
+                            $('#progressbar1').css(
+                                    'width', '100%'
+                            );
+                            $("#bannerImgsHidden").val(ret.data);
+                            $("#showPictureImg").attr('src', ret.data)
+                            break;
+                        case '6':
+                            $.scojs_message('图片大小不能超过2M', $.scojs_message.TYPE_ERROR);
+                            break;
+                        case '7':
+                            $.scojs_message('只允许上传jpg,png,gif格式的图片', $.scojs_message.TYPE_ERROR);
+                            break;
+                    }
+                },
+                progressall: function (e, data) {
+                    var progress = parseInt(data.loaded / data.total * 80, 10);
+                    $('#progressbar1').css(
+                            'width',
+                            progress + '%'
+                    );
+                },
+                fail: function (e, data) {
+                    alert("上传出错了");
+                }
+            })
+            function submitform() {
+                $('#commentForm').submit();
+            }

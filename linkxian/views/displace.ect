@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="icon" href="/imgs/favicon.ico" type="image/x-icon" media="screen">
+    <title>Link西安</title>
+    <link rel="stylesheet" href="/less/public.css">
+    <link rel="stylesheet" href="/less/nearby.css">
+    <link rel="stylesheet" href="/less/themes/default/easyui.css">
+    <link rel="stylesheet" href="/less/themes/icon.css">
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <script src="/js/jQuery-File-Upload-9.12.5/js/vendor/jquery.ui.widget.js"></script>
+    <script src="/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js"></script>
+    <script src="/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js"></script>
+    <script src="/js/jquery.easyui.min.js"></script>
+    <script src="/js/layer/layer.js"></script>
+    <!--<script src="../../../Documents/WeChat Files/sz161329418/Files/formValidatorRegex.js"></script>-->
+</head>
+<style>
+    .combo.datebox span{
+        top:-30px;
+        left:-5%;
+        width: 180%!important;
+        position:absolute;
+    }
+    .combo.datebox span.combo-arrow{
+        top:0
+    }
+</style>
+<body>
+<div class="nearby">
+    <div class="displace-top-cnt"></div>
+    <div class="input-area">
+        <form action="" method="post">
+        <div class="input-title" style="text-align: center">填写信息</div>
+        <div class="single-input">
+            <label for="sort">
+                <span>品类</span>
+                <select id="sort">
+                    <option value="" disabled selected>请选择商品类型</option>
+                    <option value="美食">美食</option>
+                    <option value="美发" >美发</option>
+                    <option value="鲜花">鲜花</option>
+                    <option value="蛋糕">蛋糕</option>
+                    <option value="爱车">爱车</option>
+                    <option value="周边游">周边游</option>
+                    <option value="水果">水果</option>
+                </select>
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="shopName">
+                <span class="mustItem">店名</span>
+                <input type="text" placeholder="填写店铺名称" id="shopName" maxlength="20">
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="shopAddress">
+                <span class="mustItem">地址</span>
+                <input type="text" placeholder="填写店铺地址" id="shopAddress">
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="shopTel">
+                <span class="mustItem">电话</span>
+                <input type="text" placeholder="填写店铺电话" id="shopTel"  minlength="11" maxlength="12">
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="shopLowerCnt">
+                <span>置换意向</span>
+                <input type="text" placeholder="填写置换意向" id="shopLowerCnt" maxlength="50">
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="shopPic">
+                <span class="mustItem">图片</span>
+                <div class="box" style="padding-left: 6%;color:black;line-height: 31px;position: relative;overflow: hidden">
+                    <input type="file" placeholder="上传展示图片" id="shopPic" value="" style="opacity: 0;width: 100%;height: 100%;position: absolute">
+                    <button style="width: 85px;height: 30px;background: #fb9077;color: #fff;border: 0;border-radius: 5px;font-size: 12px">上传图片</button>
+                </div>
+                <div style="width: 120px;height: 2px;position: relative;float: left;margin-left: 30%;border: 1px solid #ddd;display: none;margin-top: 3px" class="progressbox">
+                    <div id="progressbar"
+                         style="height: 2px; background: green; width: 0%; position: absolute; bottom: 0px; left: 0px;"
+                         class="progressLine targetImgProgress"></div>
+                </div>
+            </label>
+        </div>
+            <input type="hidden" id="shopImg" value="">
+            <div class="single-input startTime" >
+                <label for="startTime" style="height: 31px;">
+                    <span class="mustItem">起始时间</span>
+                    <input type="datetime" placeholder="请选择起始时间" class="easyui-datebox"  style="float: left"  id="startTime">
+                </label>
+
+            </div>
+            <div class="single-input" style="height: 31px;">
+                <label for="endTime">
+                    <span class="mustItem">结束时间</span>
+                    <input type="datetime" placeholder="请选择结束时间" class="easyui-datebox"  style="float: left"  id="endTime">
+                </label>
+            </div>
+        <div class="form-tip">
+            <span>＊</span>为必填项
+        </div>
+        <button class="sub-btn" id="signUp">提交</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    $(function () {
+        var startTime;
+        var endTime;
+//        选择时间
+        $.fn.datebox.defaults.formatter = function(date){
+            var y = date.getFullYear();
+            var m = date.getMonth()+1;
+            var d = date.getDate();
+            return m+'/'+d+'/'+y;
+        }
+
+        $('.combo.datebox').css('width','70%')
+        $('.panel.combo-p').on("click", function(){
+            var start=$('.combo-text').eq(0).val();
+            var dateArr=start.split("/");
+            var month = parseInt(dateArr[0]);
+            var day = parseInt(dateArr[1]);
+            var year = parseInt(dateArr[2]);
+            start=year+"/"+month+"/"+day+" 0:0:0";
+            startTime = (new Date(start)).getTime(); //得到毫秒数
+            startTime=parseInt(startTime/1000);
+            var end=$('.combo-text').eq(1).val();
+            var dateArr=end.split("/");
+            var month = parseInt(dateArr[0]);
+            var day = parseInt(dateArr[1]);
+            var year = parseInt(dateArr[2]);
+            end=year+"/"+month+"/"+day+" 0:0:0";
+            endTime = (new Date(end)).getTime(); //得到毫秒数.
+            endTime=parseInt(endTime/1000);
+        })
+        $('#shopPic').click(function () {
+            $('.progressbox').show()
+        })
+        $('#shopPic').fileupload({
+            dataType: 'json',
+            url: "/uploadimg",
+            acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
+            maxFileSize: 2 * 1024 * 1024,
+            previewMaxWidth: 180,
+            previewMaxHeight: 180,
+            previewCrop: true,
+            done: function (e, data) {
+                var ret = data.result;
+                switch (ret.error) {
+                    case '0':
+                        $('#progressbar').css(
+                            'width', '100%'
+                        );
+                        setTimeout(function () {
+                            $('.progressbox').hide()
+                        },400)
+                        $('#shopImg').val(ret.data)
+                        $(" .box") .html("上传成功");
+                        layer.open({
+                            type: 1, //Page层类型
+                            title: false,
+                            shade: 0 ,//遮罩透明度
+                            maxmin: false ,//允许全屏最小化
+                            time: 3000,
+                            anim: 1, //0-6的动画形式，-1不开启
+                            content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">上传成功</div>'
+                        });
+                        break;
+                    case '6':
+                        layer.open({
+                            type: 1, //Page层类型
+                            title: false,
+                            shade: 0 ,//遮罩透明度
+                            maxmin: false ,//允许全屏最小化
+                            time: 3000,
+                            anim: 1, //0-6的动画形式，-1不开启
+                            content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">图片大小不能超过2M</div>'
+                        });
+                        break;
+                    case '7':
+                        layer.open({
+                            type: 1, //Page层类型
+                            title: false,
+                            shade: 0 ,//遮罩透明度
+                            maxmin: false ,//允许全屏最小化
+                            time: 3000,
+                            anim: 1, //0-6的动画形式，-1不开启
+                            content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">只允许上传jpg,png,gif格式的图片</div>'
+                        });
+                        break;
+                }
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 80, 10);
+                $('#progressbar').css(
+                    'width',
+                    progress + '%'
+                );
+            },
+            fail: function (e, data) {
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">上传出错了</div>'
+                });
+            }
+        });
+        $('#signUp').click(function () {
+            var sort =  $('#sort option:selected') .val();
+            var shopName = $("#shopName").val();
+            var shopAddress = $("#shopAddress").val();
+            var shopTel = $("#shopTel").val();
+            var shopLowerCnt = $("#shopLowerCnt").val();
+            if(shopName.trim()==''||shopAddress.trim()==''||shopTel.trim()==''){
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">请填写输入框的内容</div>'
+                });
+                return false;
+            }
+            if(isNaN(startTime)||isNaN(endTime)){
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">请选择日期</div>'
+                });
+                return false;
+            }
+            var shopImg=$('#shopImg').val()
+            if(shopImg==""){
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">请选择图片</div>'
+                });
+                return false;
+            }
+
+            if(startTime>endTime){
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">请选择正确日期</div>'
+                });
+                return false;
+            }
+            if ((!(/^((0\d{2,3})-?)(\d{7,8})(-(\d{3,}))?$/.test(shopTel)))&&(!(/^1[3,4,5,7,8]\d{9}$/.test(shopTel)))) {
+                layer.open({
+                    type: 1, //Page层类型
+                    title: false,
+                    shade: 0 ,//遮罩透明度
+                    maxmin: false ,//允许全屏最小化
+                    time: 3000,
+                    anim: 1, //0-6的动画形式，-1不开启
+                    content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">请输入正确的手机号</div>'
+                });
+                return false;
+            }
+            $.post("/add_marketing_exchange",{
+                type:sort,                  //商品类型
+                shopname:shopName.trim(),          //店名
+                address:shopAddress.trim(),    //地址
+                phone:shopTel,            //电话
+                exchange_intention:shopLowerCnt.trim(),  //优惠内容
+                picurl:shopImg,            //图片
+                start_time :startTime,        //起始时间
+                end_time :endTime,            //结束时间
+            },function (data) {
+                if(data.error=='0'){
+                    layer.open({
+                        type:0, //Page层类型
+                        title: false,
+                        shade: 0 ,//遮罩透明度
+                        maxmin: false ,//允许全屏最小化
+                        time: 13000,
+                        anim: 1, //0-6的动画形式，-1不开启
+                        content: '<div style="color:#000;font-size:14px;">提交成功!</div>',
+                        btn: ['确定'],
+                        yes: function(index, layero){
+                            location.href="/";
+                        }
+                    });
+                } else if(data.error=='3'){
+                    layer.open({
+                        type: 1, //Page层类型
+                        title: false,
+                        shade: 0 ,//遮罩透明度
+                        maxmin: false ,//允许全屏最小化
+                        time: 3000,
+                        anim: 1, //0-6的动画形式，-1不开启
+                        content: '<div style="padding:5px 10px;background:rgba(0,0,0,.5);color:#fff;font-size:14px;">数据库错误!</div>'
+                    });
+                }
+            })
+            return false;
+
+        })
+
+    })
+</script>

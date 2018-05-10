@@ -1,0 +1,38 @@
+/**
+ * Created by 28994 on 2017/5/15.
+ */
+module.exports = {
+	/*各种服务器网址*/
+	siteUrl:'https://quntuji.mengotech.com',
+	wxytUrl:'http://quntuji-10004529.image.myqcloud.com',
+	siteRoot:'/data/www/quntuji',
+
+	/*小程序配置*/
+	weappConfig: {
+		appId:'wxedfda50b98a601f2',
+		appSecret:'f53c31861640f7be7619325793862244',
+	},
+	/*Redis配置*/
+	redisConfig: {
+		host: '10.66.239.73',
+		port: '6379',
+		password: 'crs-5gcg1wgk:cpt110203',
+		ttl: 1,
+	},
+
+	/*MongoDB数据库配置*/
+	mongo:{
+		mongoUser:"quntuji",
+		mongoPassword:"cpt110203",
+		mongoHost:'10.66.235.120',
+		mongoPort:27017,
+		mongoDbName:'quntuji',
+	},
+	/*腾讯云万象优图配置*/
+	wxytConfig:{
+		bucket:'quntuji',
+		appId:'10004529',
+		secretId:'AKIDTlpfIg0lSvA9uQsiWWIo44pKacQ0oQGr',
+		secretKey:'TovnSs41lGYbPzLRHsDI7g17xXszwgBS',
+	}
+}

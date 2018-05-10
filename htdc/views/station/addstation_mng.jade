@@ -1,0 +1,123 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | 管理员
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="teacherAdd" ng-controller="teacherAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 添加工位
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/officeadmin/insertstation')
+                            .form-group
+                                label.control-label.col-lg-2(for='stationId') 工位编号
+                                .col-lg-10
+                                    input#stationId.form-control(name='stationId',  type='text', value='', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price1') 入驻企业有期权价格
+                                .col-lg-10
+                                    input#price1.form-control(name='price1',  type='text', value='', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price2') 入驻企业无期权价格
+                                .col-lg-10
+                                    input#price2.form-control(name='price2',  type='text', value='', required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='price3') 普通用户价格
+                                .col-lg-10
+                                    input#price3.form-control(name='price3',  type='text', value='', required='')
+
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    input#officeId.form-control(name='officeId',  type='hidden', value='#{officeid}', required='')
+                                    button.btn.btn-primary(type='subtype',data-ng-click="submitform()") 提交
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    //script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(type='text/javascript').
+        function submitform() {
+            $('#commentForm').submit();
+        }
+
+
+
+
+
+
+
+
+

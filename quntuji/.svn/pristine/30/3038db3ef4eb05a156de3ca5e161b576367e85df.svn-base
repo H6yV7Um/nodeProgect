@@ -1,0 +1,576 @@
+/**
+ * 通用的方法
+ */
+var config = require("../common/config");
+var wxBizDataCrypt = require("../common/wxBizDataCrypt");
+var errors = require("../common/errors");
+var mongoose = require("mongoose");
+var Flock = mongoose.model("Flock");
+var Album = mongoose.model("Album");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var FlockAlbum = mongoose.model("FlockAlbum");
+var FlockUser = mongoose.model("FlockUser");
+var redisClient = require("../common/redisClient");
+var redisPrefix = require("../common/redisPrefix");
+var vipConfig = require("../common/vipConfig");
+var fs = require('fs');
+var COS = require('./cos/sdk/cos');
+var request = require("request");
+
+/**
+ * 判断对象是否空对象
+ * @param e
+ * @returns {boolean}
+ */
+var isEmptyObject = function (e) {
+	/*var t;
+	 for (t in e)
+	 return !1;
+	 return !0*/
+	if ((JSON.stringify(e) == '{}')||(null == e)){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+/**
+ * 生成随机数
+ * @param codeLength 随机数长度
+ * @returns {string} 返回值
+ */
+var createVercode = function (codeLength) {
+	code = "";
+	var random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);//随机数
+	for (var i = 0; i < codeLength; i++) {//循环操作
+		var index = Math.floor(Math.random() * 10);
+		code += random[index];//根据索引取得随机数加到code上
+	}
+	return code;
+}
+
+/**
+ * 解密微信信息
+ * encryptedData:加密的数据
+ * iv:解密向量
+ * sessionKey:sessionKey值
+ */
+var wxDecrypt = function (encryptedData,iv,sessionKey) {
+	var appId = config.weappConfig.appId;
+	/*console.log("=======++++++++++++++++++++++++++==========");
+	console.log("appId==================       "+ appId);
+	console.log("缓存里的sessionKey==================       "+ sessionKey);*/
+	var pc = new wxBizDataCrypt(appId, sessionKey);
+	var data = pc.decryptData(encryptedData , iv);
+	return data;
+};
+
+
+/**
+ * 获取随机数
+ * @param num 获取随机数的位数
+ * @returns {string}
+ */
+var randomnum = function (num) {
+	var randomnum = "";
+	for (var i = 0; i < num; i++) {
+		randomnum += Math.floor(Math.random() * 10);
+	}
+	return randomnum;
+}
+
+/**
+ * 对象数组,按某个键排序
+ * 用法:array.sort(keySort(key,isAsc));
+ * 说明:array是要排列的数组;key是排列的key值;isAsc是正逆序
+ * @param key 对象的key
+ * @param desc 是否是正序排列,1是,-1不是
+ * @returns {Function}
+ */
+var keySort = function (key, isAsc) {
+	return function (a, b) {
+		if (1 == isAsc) {
+			return (a[key] < b[key]) ? -1 : 1;
+		} else {
+			return (a[key] < b[key]) ? 1 : -1;
+		}
+
+	}
+};
+
+/**
+ * 将数字变成固定位数的字符串,前面补0;
+ * @param num
+ * @param length
+ * @returns {Blob|Buffer|Array.<T>|*|string|ArrayBuffer}
+ * @constructor
+ */
+var prefixInteger = function (num, length) {
+	return (Array(length).join('0') + num).slice(-length);
+}
+
+/**
+ * 上传图片到万象优图
+ * @param filePath 图片在服务器上的路径+名字
+ * @param fileid 存储key值
+ * @param fn 回调函数
+ */
+var uploadPicToWxyt = function (filePath,fileid,fn) {
+	var params = {
+		Bucket : config.wxytConfig.bucket,    /* 必须 */
+		Region : 'cn-east',  //cn-south、cn-north、cn-east  /* 必须 */
+		Key : fileid,    /* 必须 */
+		Body : filePath,    /* 必须 */
+		ContentLength : fs.statSync(filePath).size,    /* 必须 */
+	};
+
+	COS.putObject(params, function(err, data) {
+		if(err) {
+			fn(errors.error4,null);
+		} else {
+			fn(null,data);
+		}
+	});
+}
+
+/**
+ * 从万象优图中删除图片
+ * @param fileid
+ * @param callback
+ */
+var deletePicFromWxyt = function (fileId, fn) {
+	var params = {
+		Bucket : config.wxytConfig.bucket,    /* 必须 */
+		Region : 'cn-east',  //cn-south、cn-north、cn-east  /* 必须 */
+		Key : fileId,    /* 必须 */
+	};
+
+	COS.deleteObject(params, function(err, data) {
+		if(err) {
+			fn(err,null);
+		} else {
+			fn(null,data);
+		}
+	});
+}
+
+/**
+ * 关联群图集和群
+ * @param openId   用户openId
+ * @param openGId   群openId
+ */
+var linkUserAndFlock = function (openId, openGId) {
+	FlockUser.findOne({openId:openId, openGId:openGId},function (err, data) {
+		//console.log("开始关联了============");
+		if (!err){
+			if (!data){//若未关联则关联
+				var flockUser = new FlockUser({
+					openId:openId,                                 //群objectId
+					openGId:openGId,                                  //用户objectId
+					createTime:Date.now(),                              //关联时间
+				});
+				flockUser.save(function (err1, data1) {
+				});
+				Flock.update({openGId:openGId},{$inc:{followerNum:1}});
+				buildFlockInfoCache(openGId,function () {});
+			}else {// 若已关联
+			}
+		}
+	});
+}
+
+/**
+ * 群首页信息生成/刷新函数
+ * @param openGId
+ */
+
+//数组去重
+Array.prototype.unique = function(){
+	var res = [];
+	var json = {};
+	for(var i = 0; i < this.length; i++){
+		if(!json[this[i]]){
+			res.push(this[i]);
+			json[this[i]] = 1;
+		}
+	}
+	return res;
+}
+
+var buildFlockInfoCache = function (openGId,fn) {
+	Flock.findOne({openGId:openGId},function (err, flock) {
+		if (!err){
+			if(flock){
+			//查询和本群相关的相册
+				FlockAlbum.find({openGId:flock.openGId},function (err1, docs1) {
+					if (!err1 && docs1){
+						var ids = [];
+						var albumIds = [];
+						for( var i=0;i< docs1.length;i++){
+							ids.push(mongoose.Types.ObjectId(docs1[i].albumId));
+							albumIds.push(docs1[i].albumId);
+						}
+
+
+						//遍历所有相册
+						Album.find({_id:{$in:ids}}).sort({'createTime':-1}).exec(function (err2,albums) {
+
+							if (!err2 && albums){
+								var contributors = [];
+								for (var j = 0;j< albums.length ;j++){
+									contributors.push(albums[j].creatorHeadPic);
+								}
+								var cons = contributors.unique();//去重复
+								/*获取10条动态*/
+								PatchPhoto.find({albumId:{$in:albumIds}}).sort({'createTime':-1}).limit(10).exec(function(err3,docs3){
+
+									if (!err3 && docs3){
+										var flockInfo = {
+											flockId:flock._id,
+											flockName:flock.flockName,                              //群相册名称
+											flockPicIndex:flock.flockPicIndex,                                //群头像序号,默认为0,以此递增.若为-1,则表示自定义头像(未来添加)
+											flockPicUrl:flock.flockPicUrl,                                //群头像
+											creatorOpenId:flock.creatorOpenId,                           //创建者openid
+											creatorName:flock.creatorName,                           //创建者昵称
+											creatorHeadPic:flock.creatorHeadPic,                          //创建者头像
+											followerNum:flock.followerNum,                             //人气数,默认为0
+											openGId:flock.openGId,                                //群Id
+											photoCount:flock.photoNum,                                  //照片总数
+											contributors:cons,                              //贡献者列表
+											dynimics:docs3,                                         //群动态
+										}
+										var fiData = JSON.stringify(flockInfo);
+										redisClient.set(redisPrefix.FLOCK_HOME_DATA_BY_OPEN_GROUP_ID+openGId,fiData,function (e,v) {
+											fn(null,fiData);
+										});
+									}else {
+										fn(err3,null);
+									}
+								});
+							}else {
+								fn(err2,null);
+							}
+						});
+					}else {
+						fn(err1,null);
+					}
+				});
+			}else {
+				fn(null,null);
+			}
+		}else {
+			fn(err,null);
+		}
+	});
+}
+
+/**
+ * 根据openGId获得群的首页信息，若群未创建，则返回null
+ * @param openGId
+ * @param fn
+ */
+var getFlockInfoByOpenGId = function (openGId, fn) {
+	redisClient.get(redisPrefix.FLOCK_HOME_DATA_BY_OPEN_GROUP_ID+openGId,function (e,v) {
+		if(!e && v){
+			fn(e,v);
+		}else {
+			buildFlockInfoCache(openGId,function (err,value) {
+				//console.log((value));
+				if(!err && value){
+					fn(null,value);
+				}else {
+					fn(null,null);
+				}
+			});
+		}
+	})
+};
+
+var getVipLevelPrice = function (level) {
+	var authority,price;
+	switch (level){
+		case '0':
+			authority = vipConfig.authority.vip0;
+			price=[
+				(vipConfig.authority.vip0.price * vipConfig.discount.oneMonth).toFixed(0),
+				(vipConfig.authority.vip0.price * vipConfig.discount.threeMonths * 3 ).toFixed(0),
+				(vipConfig.authority.vip0.price * vipConfig.discount.sixMonths * 6 ).toFixed(0),
+				(vipConfig.authority.vip0.price * vipConfig.discount.oneYear * 12 ).toFixed(0),
+				(vipConfig.authority.vip0.price * vipConfig.discount.twoYear * 24 ).toFixed(0),
+				(vipConfig.authority.vip0.price * vipConfig.discount.threeYear * 36 ).toFixed(0),
+			];
+			break;
+		case '1':
+			authority = vipConfig.authority.vip1;
+			price=[
+				(vipConfig.authority.vip1.price * vipConfig.discount.oneMonth).toFixed(0),
+				(vipConfig.authority.vip1.price * vipConfig.discount.threeMonths * 3 ).toFixed(0),
+				(vipConfig.authority.vip1.price * vipConfig.discount.sixMonths * 6 ).toFixed(0),
+				(vipConfig.authority.vip1.price * vipConfig.discount.oneYear * 12 ).toFixed(0),
+				(vipConfig.authority.vip1.price * vipConfig.discount.twoYear * 24 ).toFixed(0),
+				(vipConfig.authority.vip1.price * vipConfig.discount.threeYear * 36 ).toFixed(0),
+			];
+			break;
+		case '2':
+			authority = vipConfig.authority.vip2;
+			price=[
+				(vipConfig.authority.vip2.price * vipConfig.discount.oneMonth).toFixed(0),
+				(vipConfig.authority.vip2.price * vipConfig.discount.threeMonths * 3 ).toFixed(0),
+				(vipConfig.authority.vip2.price * vipConfig.discount.sixMonths * 6 ).toFixed(0),
+				(vipConfig.authority.vip2.price * vipConfig.discount.oneYear * 12 ).toFixed(0),
+				(vipConfig.authority.vip2.price * vipConfig.discount.twoYear * 24 ).toFixed(0),
+				(vipConfig.authority.vip2.price * vipConfig.discount.threeYear * 36 ).toFixed(0),
+			];
+			break;
+		case '3':
+			authority = vipConfig.authority.vip3;
+			price=[
+				(vipConfig.authority.vip3.price * vipConfig.discount.oneMonth).toFixed(0),
+				(vipConfig.authority.vip3.price * vipConfig.discount.threeMonths * 3 ).toFixed(0),
+				(vipConfig.authority.vip3.price * vipConfig.discount.sixMonths * 6 ).toFixed(0),
+				(vipConfig.authority.vip3.price * vipConfig.discount.oneYear * 12 ).toFixed(0),
+				(vipConfig.authority.vip3.price * vipConfig.discount.twoYear * 24 ).toFixed(0),
+				(vipConfig.authority.vip3.price * vipConfig.discount.threeYear * 36 ).toFixed(0),
+			];
+			break;
+	};
+	return {
+		authority:authority,
+		price:price,
+	}
+}
+
+/**
+ * 日期加月计算
+ * num:要加的月数
+ * sdate:要计算的日期，日期对象
+ */
+var addMonth = function (num,sdate) {
+	//日期不传默认为当前日期
+	var d = sdate || new Date();
+	//当前月份
+	var oldMonth = d.getMonth();
+	//当前几号
+	var oldDay = d.getDate();
+	//每月多少天，平年
+	var days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	//闰年二月为29天
+	var fullYear = d.getFullYear();
+	if ((fullYear % 4 == 0 && fullYear % 100 != 0) || fullYear % 400 == 0) {
+		days[1] = 29;
+	}
+	//加月，设置月为：当前月份+要加的月数
+	d.setMonth(oldMonth + num);
+	//计算月日
+	var newDay = d.getDate();
+	if (oldDay == days[oldMonth]) {
+		if(newDay != oldDay){
+			//设置新日期为：新日期的上个月的最后一天
+			d.setDate(0);
+		}else{
+			//设置为当月最后一天
+			d.setDate(1);
+			d.setMonth(d.getMonth()+1);
+			d.setDate(0);
+		}
+	}
+	//输出年月日，月日不足10前面补0
+	var y = d.getFullYear();
+	var m = d.getMonth() + 1;
+	var dd = d.getDate();
+	if (m < 10) {
+		m = '0' + m;
+	}
+	if (dd < 10) {
+		dd = '0' + dd;
+	}
+	//return y + "-" + m + "-" + dd;
+	return Date.parse(y + "-" + m + "-" + dd + " 00:00:00");
+}
+
+/**
+ * 发送邮件
+ * @param address  对方邮箱地址
+ * @param subject  主题
+ * @param content  内容
+ */
+var sendMail = function (address, subject, content,fn) {
+	var nodemailer = require("nodemailer");
+	var smtpTransport = require('nodemailer-smtp-transport');
+	var wellknown = require("nodemailer-wellknown");
+	var config = wellknown("QQ");
+
+	var sysConfig = require("../common/config");
+
+	config.auth = {
+		user: sysConfig.emailConfig.user,
+		//这里密码不是qq密码，是你设置的smtp密码
+		pass: sysConfig.emailConfig.password,
+	}
+	var transporter = nodemailer.createTransport(smtpTransport(config));
+	var mailOptions = {
+		from: sysConfig.emailConfig.user, // 发件地址
+		to: address, // 收件列表
+		subject: subject, // 标题
+		//text和html两者只支持一种
+		//text: 'Hello world ?hahha', // 标题
+		html: content // html 内容
+	};
+
+// send mail with defined transport object
+	transporter.sendMail(mailOptions, function(error, info){
+		if(error){
+			fn(error,null);
+		}else {
+			fn(null, 'ok');
+		}
+	});
+}
+
+/**
+ * 时间格式化
+ * @param fmt
+ * @returns {*}
+ * @constructor
+ */
+Date.prototype.format = function (fmt) { //author: meizz
+	var o = {
+		"M+": this.getMonth() + 1, //月份
+		"d+": this.getDate(), //日
+		"h+": this.getHours(), //小时
+		"m+": this.getMinutes(), //分
+		"s+": this.getSeconds(), //秒
+		"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+		"S": this.getMilliseconds() //毫秒
+	};
+	if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+	for (var k in o)
+		if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+	return fmt;
+}
+
+var sendTemplateMessage = function (formId, accessToken,receiverOpenId, page, data ,templateId) {
+	var url = 'https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=' +accessToken;
+	request(url, {form:{
+		touser:receiverOpenId,
+		template_id:templateId,
+		page:page,
+		form_id:formId,
+		data:data,
+	}}, function(err,httpResponse,body){
+		console.log(err);
+		console.log("-----------------------");
+		console.log(httpResponse);
+		console.log("-----------------------");
+		console.log(body);
+		console.log("-----------------------");
+	});
+	
+}
+
+/**
+ * 发模版消息.提现申请审批通过时触发
+ * @param formId
+ * @param accessToken
+ * @param receiverOpenId
+ * @param page
+ * @param money
+ * @param applyTime
+ */
+var sendTemplateMessageApproveNotice = function (formId, accessToken,receiverOpenId,page,money,applyTime ) {
+	var templateId = 'dZwuVPGX7MB6277QuM43OkUkTDwHTKY6IAo5bXO8FF8';
+	var data = {
+		keyword1: {
+			value:'您的提现申请已审核通过'
+		},
+		keyword2: {
+			value: money + "元",
+		},
+		keyword3: {
+			value: "提现金额已存入您的微信钱包，请在微信钱包中查看。",
+		} ,
+		keyword4: {
+			value: new Date(applyTime).format("yyyy-MM-dd hh:mm:ss"),
+		},
+		keyword5: {
+			value: new Date().format("yyyy-MM-dd hh:mm:ss"),
+		}
+	};
+	sendTemplateMessage(formId,accessToken,receiverOpenId,page,data,templateId);
+}
+
+/**
+ * 发模版消息.上传图片成功时触发
+ * @param formId
+ * @param accessToken
+ * @param receiverOpenId
+ * @param flockName
+ * @param fileNum
+ * @param uploaderName
+ */
+var sendTemplateMessageUploadFileNotice = function (formId, accessToken,receiverOpenId,flockName,fileNum,uploaderName) {
+	var templateId = '299rFluZExwiJ5qIQV9nFNAEqo7QucpGygPrhu_1yNM';
+	var data = {
+		keyword1: {
+			value:flockName
+		},
+		keyword2: {
+			value: fileNum + "张图片",
+		},
+		keyword3: {
+			value: uploaderName,
+		} ,
+		keyword4: {
+			value: new Date().format("yyyy-MM-dd hh:mm:ss"),
+		},
+	};
+	sendTemplateMessage(formId,accessToken,receiverOpenId,page,data,templateId);
+}
+
+/**
+ * 发模版消息.购买相册成功时触发
+ * @param formId
+ * @param accessToken
+ * @param receiverOpenId
+ * @param price
+ * @param buyerName
+ * @param albumName
+ */
+var sendTemplateMessageBuySuccessNotice = function (formId, accessToken,receiverOpenId,price, buyerName,albumName) {
+	var templateId = 'plAdnzzC_LYVU-As2F8h1VhuA4B4JUoH9ZkaMtcQIws';
+	var data = {
+		keyword1: {
+			value:price + "元",
+		},
+		keyword2: {
+			value: buyerName,
+		},
+		keyword3: {
+			value: '相册《' + albumName + '》的查看权限',
+		} ,
+		keyword4: {
+			value: new Date().format("yyyy-MM-dd hh:mm:ss"),
+		},
+	};
+	sendTemplateMessage(formId,accessToken,receiverOpenId,page,data,templateId);
+}
+
+module.exports = {
+	isEmptyObject:isEmptyObject,
+	createVercode:createVercode,
+	wxDecrypt:wxDecrypt,
+	randomnum:randomnum,
+	keySort:keySort,
+	prefixInteger:prefixInteger,
+	uploadPicToWxyt:uploadPicToWxyt,
+	deletePicFromWxyt:deletePicFromWxyt,
+	linkUserAndFlock:linkUserAndFlock,
+	buildFlockInfoCache:buildFlockInfoCache,
+	getFlockInfoByOpenGId:getFlockInfoByOpenGId,
+	getVipLevelPrice:getVipLevelPrice,
+	addMonth:addMonth,
+	sendMail:sendMail,
+	sendTemplateMessageApproveNotice:sendTemplateMessageApproveNotice,
+	sendTemplateMessageUploadFileNotice:sendTemplateMessageUploadFileNotice,
+	sendTemplateMessageBuySuccessNotice:sendTemplateMessageBuySuccessNotice,
+}

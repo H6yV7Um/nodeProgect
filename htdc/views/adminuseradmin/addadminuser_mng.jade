@@ -1,0 +1,144 @@
+extends ../layout
+block myCss
+    // 引入wangEditor.css
+    //link(rel='stylesheet', type='text/css', href='/js/wangEditor-2.1.19/dist/css/wangEditor.min.css')
+
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        div.iradio_square-green {
+            display: inline-block;;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        div.square-green {
+            height: auto;
+            overflow: hidden;
+            margin-bottom: 10px !important;
+        }
+
+        div.radio {
+            margin-bottom: 10px !important;
+            margin-top: 10px !important;
+        }
+
+        span.help-block {
+            color: #9e9e9e;
+            font-size: 1.3rem;
+        }
+
+        /*地图样式设置*/
+
+        div#showMap {
+            position: relative;
+            height: auto;
+            overflow: hidden;
+            top: 10px;
+        }
+
+        div#allMap {
+            display: block;
+        }
+
+        input#closeMap {
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .iw_poi_title {
+            color: #CC5522;
+            font-size: 14px;
+            font-weight: bold;
+            overflow: hidden;
+            padding-right: 13px;
+            white-space: nowrap
+        }
+
+        .iw_poi_content {
+            font: 12px arial, sans-serif;
+            overflow: visible;
+            padding-top: 4px;
+            white-space: -moz-pre-wrap;
+            word-wrap: break-word
+        }
+    script(type='text/javascript', src='http://api.map.baidu.com/api?key=&v=1.4&services=true')
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | 管理员
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="shopAdd" ng-controller="shopAddCtrl")
+        .col-md-12
+            // 已授权但未上线状态
+            section.panel
+                header.panel-heading
+                    | 管理者信息
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/adminuseradmin/insertadminuser')
+                            .form-group
+                                label.control-label.col-lg-2(for='account') 手机号
+                                .col-lg-10
+                                    input#account.form-control(name='account',  type='text', value='', required='')
+                            .form-group
+                                label.control-label.col-lg-2 分配管理权限
+                                .col-lg-10
+                                    each admin in admins
+                                        span.col-lg-3
+                                            label.control-label.col-lg-4 #{admin.name}
+                                            input(name="authorization", type="checkbox", value="#{admin.code}")
+
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    button.btn.btn-primary(type='button',onclick="submitform()") 提交
+block myScript
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(type='text/javascript').
+        function submitform() {
+            $.post("/adminuseradmin/getuser", {
+                account: $("#account").val(),
+            }, function (data) {
+                if ('3' == data.error) {
+                    $.scojs_message('数据库操作失败', $.scojs_message.TYPE_ERROR);
+                    return false;
+                }
+                if ('60006' == data.error) {
+                    $.scojs_message('该联系方式已注册店铺', $.scojs_message.TYPE_ERROR);
+                    return false;
+                }
+                if ('0' == data.error) {
+                    $('#commentForm').submit();
+                }
+            })
+
+        }
+
+
+
+
+

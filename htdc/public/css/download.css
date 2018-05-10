@@ -1,0 +1,38 @@
+@charset "utf-8";
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background-image: url(../images/bg.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    text-align: center;
+}
+.an{
+    margin: 90% auto 0;
+    width: 275px;
+    height: 60px;
+    background-image: url(../images/an.png);
+    background-size: 275px 60px;
+    background-repeat: no-repeat;
+}
+.an:active{
+    background-image: url(../images/an1.png);
+}
+.ios{
+    margin: 5% auto 0;
+    width: 275px;
+    height: 60px;
+    background-image: url(../images/ios.png);
+    background-size: 275px 60px;
+    background-repeat: no-repeat;
+}
+.ios:active{
+    background-image: url(/public/images/ios1.png);
+}
+.sign{
+    font-size: 12px;
+    color: #d4d4d4;
+    margin-top: 5%;
+}

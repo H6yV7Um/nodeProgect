@@ -1,0 +1,131 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="teacherAdd" ng-controller="teacherAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 添加门锁
+                .panel-body
+                    .form
+                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/lockadmin/insertlock')
+                            .form-group
+                                label.control-label.col-lg-2(for='lockName') 门锁名字
+                                .col-lg-10
+                                    input#lockName.form-control(name='lockName',  type='text', value='',required='')
+                            .form-group
+                                label.control-label.col-lg-2(for='mac') 门锁设备地址
+                                .col-lg-10
+                                    input#mac.form-control(name='mac',  type='text', value='',required='')
+                            .form-group
+                                .col-lg-offset-2.col-lg-10
+                                    button#login.btn.btn-primary(type='button',onclick='submitform()') 提交
+
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    //script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(type='text/javascript').
+        function submitform() {
+            var mac= $("#mac").val();
+            var name = $("#lockName").val();
+            if(mac == ''){
+                $.scojs_message('请输入mac地址');
+            }
+            if (name == '') {
+                $.scojs_message('请输入门锁名称');
+            }
+            if((mac != '') && (name != '')){
+                $.post("/lockadmin/checklock", {
+                    mac: $("#mac").val(),
+                }, function (data) {
+                    if ('3' == data.error) {
+                        $.scojs_message('查询失败', $.scojs_message.TYPE_ERROR);
+                        return false;
+                    }
+                    if ('10015' == data.error) {
+                        $.scojs_message('该门锁设备已存在', $.scojs_message.TYPE_ERROR);
+                        return false;
+                    }
+                    if ('0' == data.error) {
+                        $("#commentForm").submit()
+                    }
+                })
+            }
+
+        }
+

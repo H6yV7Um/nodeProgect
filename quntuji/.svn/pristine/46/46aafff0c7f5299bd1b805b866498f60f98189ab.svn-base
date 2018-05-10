@@ -1,0 +1,90 @@
+var express = require('express');
+var router = express.Router();
+var mongoose = require("mongoose");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var Photo = mongoose.model("Photo");
+var tencentyun = require("tencentyun");
+var config = require("../common/config");
+var functions = require("../common/functions");
+var formidable = require('formidable');
+var fs = require('fs');
+
+
+
+router.post("/uploadimages/:albumId", function (req, res, next) {
+	/*相册id*/
+	var albumId = req.params.albumId;
+	/*上传业务*/
+	var form = new formidable.IncomingForm();                   //创建上传表单
+	form.encoding = 'utf-8';		                            //设置编辑
+	form.uploadDir = config.siteRoot+'/uploads/';	            //设置上传目录
+	form.keepExtensions = true;	                                //保留后缀
+	form.maxFieldsSize = 2 * 1024 *1024;                        //文件大小
+	var files=[],fields=[],docs=[];
+
+	form.on('error', function(err) {
+		if (err){
+			console.log("上传图片出错啦");
+		}
+	}).on('field', function(field, value) {
+		fields.push([field, value]);
+	}).on('file', function(field, file) {
+		files.push([field, file]);
+		docs.push(file);
+		var extension = file.name.substring(file.name.lastIndexOf('.'), file.name.length).toLowerCase();
+		if (file.size > 2*2048*2048){               //如果图片大于2M
+			fs.unlink(file.path,function () {});
+			res.status(200).json(errors.error6);
+		}else if((extension !== '.jpg')&&(extension !== '.png')&&(extension !== '.gif')&&(extension !== '.jpeg')){                                 //如果上传的图片格式不是jpg,png,gif
+			fs.unlink(file.path,function () {});
+			res.status(200).json(errors.error7);
+		}else {                                     //开始上传
+			/*生成文件名*/
+			var fileid = albumId+'/'+Math.round(+new Date()/1000)+functions.randomnum(4)+extension;
+
+			functions.uploadPicToWxyt(file.path,fileid,function (err, ret) {
+				if(!err){
+
+					// 上传成功，删除源文件
+					fs.unlink(file.path,function () {});
+					console.log(ret);
+					console.log(ret.info);
+					/*保存到相册中*/
+					var photo = new Photo({
+						albumId:albumId,                              //相册objectId
+						downloadUrl:ret.downloadUrl,                               //相册下载地址
+						fileid: ret.fileid,                    //图片key值
+						wxytUrl:ret.wxytUrl,
+						patchId:'',                //上传批次
+						createTime:Date.now(),                                 //创建时间
+					});
+					photo.save(function () {});
+					//处理返回值
+					res.status(200).json({
+						error:0,
+						message:"success",
+						data:ret,
+					});
+				}else{
+					res.status(200).json(err);
+				}
+			});
+		}
+
+	}).on('end', function() {
+
+	});
+
+	form.parse(req, function(err, fields, files) {
+		err && console.log('formidabel error : ' + err);
+	});
+});
+
+
+router.get("/test", function (req, res, next) {
+	Photo.find({},function (e , v) {
+		res.json(v);
+	})
+});
+
+module.exports = router;

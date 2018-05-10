@@ -1,0 +1,121 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "qcloud-weapp-server-sdk",
+        "scope": null,
+        "escapedName": "qcloud-weapp-server-sdk",
+        "name": "qcloud-weapp-server-sdk",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/data/www/quntuji"
+    ]
+  ],
+  "_from": "qcloud-weapp-server-sdk@latest",
+  "_id": "qcloud-weapp-server-sdk@0.8.2",
+  "_inCache": true,
+  "_location": "/qcloud-weapp-server-sdk",
+  "_nodeVersion": "6.9.1",
+  "_npmOperationalInternal": {
+    "host": "packages-18-east.internal.npmjs.com",
+    "tmp": "tmp/qcloud-weapp-server-sdk-0.8.2.tgz_1479638804629_0.40297178784385324"
+  },
+  "_npmUser": {
+    "name": "qcloud",
+    "email": "techird@qq.com"
+  },
+  "_npmVersion": "3.10.8",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "qcloud-weapp-server-sdk",
+    "scope": null,
+    "escapedName": "qcloud-weapp-server-sdk",
+    "name": "qcloud-weapp-server-sdk",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/qcloud-weapp-server-sdk/-/qcloud-weapp-server-sdk-0.8.2.tgz",
+  "_shasum": "6aebf8626be45db26e751360d66141a5c2b1716b",
+  "_shrinkwrap": null,
+  "_spec": "qcloud-weapp-server-sdk",
+  "_where": "/data/www/quntuji",
+  "author": {
+    "name": "CFETeam"
+  },
+  "bugs": {
+    "url": "https://github.com/tencentyun/wafer-node-server-sdk/issues"
+  },
+  "dependencies": {
+    "co": "^4.6.0",
+    "es6-promisify": "^5.0.0",
+    "request": "^2.75.0"
+  },
+  "description": "Wafer 服务端 SDK - Node.js",
+  "devDependencies": {
+    "body-parser": "^1.15.2",
+    "co": "^4.6.0",
+    "coveralls": "^2.11.14",
+    "express": "^4.14.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.1.2",
+    "mocha-lcov-reporter": "^1.2.0",
+    "node-mocks-http": "^1.5.4",
+    "nodemon": "^1.11.0",
+    "should": "^11.1.1",
+    "should-sinon": "0.0.5",
+    "sinon": "^1.17.6"
+  },
+  "directories": {},
+  "dist": {
+    "shasum": "6aebf8626be45db26e751360d66141a5c2b1716b",
+    "tarball": "https://registry.npmjs.org/qcloud-weapp-server-sdk/-/qcloud-weapp-server-sdk-0.8.2.tgz"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "gitHead": "4510e7b1e6cad355e55e9c6ad00992b5a915a4f8",
+  "homepage": "https://github.com/tencentyun/wafer-node-server-sdk#readme",
+  "keywords": [
+    "authentication",
+    "login",
+    "weapp",
+    "wechat",
+    "websocket",
+    "sdk"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "miusuncle",
+      "email": "miusuncle@gmail.com"
+    },
+    {
+      "name": "qcloud",
+      "email": "techird@qq.com"
+    }
+  ],
+  "name": "qcloud-weapp-server-sdk",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tencentyun/wafer-node-server-sdk.git"
+  },
+  "scripts": {
+    "coveralls": "npm run travis-test-cov && cat ./coverage/lcov.info | coveralls",
+    "test": "mocha --reporter spec --check-leaks --bail --slow 1000 --recursive test/test-suite/",
+    "test-cov": "istanbul cover ./node_modules/mocha/bin/_mocha -- --reporter spec --check-leaks --bail --slow 1000 --recursive test/test-suite/",
+    "test-server": "nodemon test/test-server --watch ./test/test-server/",
+    "travis-test-cov": "istanbul cover --report lcovonly ./node_modules/mocha/bin/_mocha -- --reporter spec --check-leaks --bail --slow 1000 --recursive test/test-suite/",
+    "travis-test-server": "node test/test-server > /dev/null 2>&1"
+  },
+  "version": "0.8.2"
+}

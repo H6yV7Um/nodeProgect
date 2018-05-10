@@ -1,0 +1,57 @@
+var express = require('express');
+var router = express.Router();
+var mongoose = require("mongoose");
+var Flock = mongoose.model("Flock");
+var fs = require("fs");
+var redisClient = require("../common/redisClient");
+var functions = require("../common/functions");
+
+var getMyFlockFromMongo = function (openid,cb) {
+
+}
+
+var getMyFlockFromRedis = function (openid, cb) {
+	redisClient.get("dsfas",function (err, value) {
+		if(err) return cb(err, null);
+		if (!v) return cb(null, null);
+		try {
+			return cb(null, JSON.parse(value));
+		}catch(e){
+			return cb(e, null);
+		}
+	})
+}
+
+/* 获取我的群信息 */
+router.get('/index', function (req, res, next) {
+
+});
+
+/* 加载更多的群信息 */
+router.get('/moreflock/:page', function (req, res, next) {
+	var cos = require("../utils/cos/sdk/cos");
+	/*var params = {
+	 Bucket : 'quntujixiaochengxu',    /!* 必须 *!/
+	 Region : 'cn-east',  //cn-south、cn-north、cn-east  /!* 必须 *!/
+	 Key : 'IMG_0989.JPG',    /!* 必须 *!/
+	 Body : 'C:/Users/28994/Pictures/Saved Pictures/IMG_0989.JPG',    /!* 必须 *!/
+	 ContentLength : fs.statSync('C:/Users/28994/Pictures/Saved Pictures/IMG_0989.JPG').size,    /!* 必须 *!/
+	 };*/
+
+
+	cos.getService({}, function(err, data) {
+		if(err) {
+			console.log(err);
+		} else {
+			console.log(data);
+		}
+	});
+	res.json('33');
+});
+
+/* 我的相册页面 */
+router.get('/myalbum', function (req, res, next) {
+	res.json(test());
+});
+
+module.exports = router;

@@ -1,0 +1,250 @@
+/**
+ * 通用的方法
+ */
+var config = require("../common/config");
+var wxBizDataCrypt = require("../common/wxBizDataCrypt");
+var errors = require("../common/errors");
+var mongoose = require("mongoose");
+var Flock = mongoose.model("Flock");
+var Album = mongoose.model("Album");
+var PatchPhoto = mongoose.model("PatchPhoto");
+var FlockAlbum = mongoose.model("FlockAlbum");
+var FlockUser = mongoose.model("FlockUser");
+var redisClient = require("../common/redisClient");
+var redisPrefix = require("../common/redisPrefix");
+
+/**
+ * 判断对象是否空对象
+ * @param e
+ * @returns {boolean}
+ */
+var isEmptyObject = function (e) {
+	/*var t;
+	 for (t in e)
+	 return !1;
+	 return !0*/
+	if ((JSON.stringify(e) == '{}')||(null == e)){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+/**
+ * 生成随机数
+ * @param codeLength 随机数长度
+ * @returns {string} 返回值
+ */
+var createVercode = function (codeLength) {
+	code = "";
+	var random = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);//随机数
+	for (var i = 0; i < codeLength; i++) {//循环操作
+		var index = Math.floor(Math.random() * 10);
+		code += random[index];//根据索引取得随机数加到code上
+	}
+	return code;
+}
+
+/**
+ * 解密微信信息
+ * encryptedData:加密的数据
+ * iv:解密向量
+ * sessionKey:sessionKey值
+ */
+var wxDecrypt = function (encryptedData,iv,sessionKey) {
+	var appId = config.weappConfig.appId;
+	var pc = new wxBizDataCrypt(appId, sessionKey);
+	var data = pc.decryptData(encryptedData , iv);
+	return data;
+};
+
+
+/**
+ * 获取随机数
+ * @param num 获取随机数的位数
+ * @returns {string}
+ */
+var randomnum = function (num) {
+	var randomnum = "";
+	for (var i = 0; i < num; i++) {
+		randomnum += Math.floor(Math.random() * 10);
+	}
+	return randomnum;
+}
+
+/**
+ * 对象数组,按某个键排序
+ * 用法:array.sort(keySort(key,isAsc));
+ * 说明:array是要排列的数组;key是排列的key值;isAsc是正逆序
+ * @param key 对象的key
+ * @param desc 是否是正序排列,1是,-1不是
+ * @returns {Function}
+ */
+var keySort = function (key, isAsc) {
+	return function (a, b) {
+		if (1 == isAsc) {
+			return (a[key] < b[key]) ? -1 : 1;
+		} else {
+			return (a[key] < b[key]) ? 1 : -1;
+		}
+
+	}
+};
+
+/**
+ * 将数字变成固定位数的字符串,前面补0;
+ * @param num
+ * @param length
+ * @returns {Blob|Buffer|Array.<T>|*|string|ArrayBuffer}
+ * @constructor
+ */
+var prefixInteger = function (num, length) {
+	return (Array(length).join('0') + num).slice(-length);
+}
+
+/**
+ * 上传图片到万象优图
+ * @param filePath 图片在服务器上的路径+名字
+ * @param fileid 存储key值
+ * @param fn 回调函数
+ */
+var uploadPicToWxyt = function (filePath,fileid,fn) {
+	var tencentyun = require("tencentyun");
+	var bucket = config.wxytConfig.bucket,
+		projectId = config.wxytConfig.appId,
+		secretId = config.wxytConfig.secretId,
+		secretKey = config.wxytConfig.secretKey;
+	tencentyun.conf.setAppInfo(projectId, secretId, secretKey);
+
+	tencentyun.imagev2.upload(filePath, bucket, fileid, function(ret) {
+		if (0 == ret.code) {
+			fn(null,ret.data);
+		}else{
+			fn(errors.error4,null);
+		}
+	});
+}
+
+/**
+ * 关联群图集和群
+ * @param openId   用户openId
+ * @param openGId   群openId
+ */
+var linkUserAndFlock = function (openId, openGId) {
+	FlockUser.findOne({openId:openId, openGId:openGId},function (err, data) {
+		//console.log("开始关联了============");
+		if (!err){
+			if (!data){//若未关联则关联
+				var flockUser = new FlockUser({
+					openId:openId,                                 //群objectId
+					openGId:openGId,                                  //用户objectId
+					createTime:Date.now(),                              //关联时间
+				});
+				flockUser.save(function (err1, data1) {
+				});
+				Flock.update({openGId:openGId},{$inc:{followerNum:1}});
+			}else {// 若已关联
+			}
+		}
+	});
+}
+
+/**
+ * 群首页信息生成/刷新函数
+ * @param openGId
+ */
+var buildFlockInfoCache = function (openGId,fn) {
+	Flock.findOne({openGId:openGId},function (err, flock) {
+		if (!err){
+			if(flock){
+			//查询和本群相关的相册
+				FlockAlbum.find({flockId:flock._id},function (err1, docs1) {
+					if (!err1 && docs1){
+						var ids = [];
+						var albumIds = [];
+						for( var i in docs1){
+							ids.push(mongoose.Types.ObjectId(docs1[i].albumId));
+							albumIds.push(docs1[i].albumId);
+						}
+
+						//遍历所有相册
+						Album.find({_id:{$in:ids}}).sort({'createTime':-1}).exec(function (err2,albums) {
+
+							if (!err2 && albums){
+								var contributors = [];
+								for (var j in albums){
+									contributors.push(albums[j].creatorHeadPic);
+								}
+								/*获取10条动态*/
+								PatchPhoto.find({albumId:{$in:albumIds}}).sort({'createTime':-1}).limit(10).exec(function(err3,docs3){
+									if (!err3 && docs3){
+										var flockInfo = {
+											flockId:flock._id,
+											flockName:flock.flockName,                              //群相册名称
+											flockPicIndex:flock.flockPicIndex,                                //群头像序号,默认为0,以此递增.若为-1,则表示自定义头像(未来添加)
+											flockPicUrl:flock.flockPicUrl,                                //群头像
+											creatorOpenId:flock.creatorOpenId,                           //创建者openid
+											creatorName:flock.creatorName,                           //创建者昵称
+											creatorHeadPic:flock.creatorHeadPic,                          //创建者头像
+											followerNum:flock.followerNum,                             //人气数,默认为0
+											openGId:flock.openGId,                                //群Id
+											photoCount:flock.photoNum,                                  //照片总数
+											contributors:contributors,                              //贡献者列表
+											dynimics:docs3,                                         //群动态
+										}
+										redisClient.set(redisPrefix.FLOCK_HOME_DATA_BY_OPEN_GROUP_ID+openGId,JSON.stringify(flockInfo),function (e,v) {
+											fn(null,flockInfo);
+										});
+									}else {
+										fn(err3,null);
+									}
+								});
+							}else {
+								fn(err2,null);
+							}
+						});
+					}else {
+						fn(err1,null);
+					}
+				});
+			}else {
+				fn(null,null);
+			}
+		}else {
+			fn(err,null);
+		}
+	});
+}
+
+/**
+ * 根据openGId获得群的首页信息，若群未创建，则返回null
+ * @param openGId
+ */
+var getFlockInfoByOpenGId = function (openGId,fn) {
+	redisClient.get(redisPrefix.FLOCK_HOME_DATA_BY_OPEN_GROUP_ID+openGId,function (e,v) {
+		if(!e && v){
+			fn(e,v);
+		}else {
+			buildFlockInfoCache(openGId,function (err,value) {
+				if(!err && value){
+					fn(null,value);
+				}else {
+					fn(null,null);
+				}
+			});
+		}
+	})
+}
+
+module.exports = {
+	isEmptyObject:isEmptyObject,
+	createVercode:createVercode,
+	wxDecrypt:wxDecrypt,
+	randomnum:randomnum,
+	keySort:keySort,
+	prefixInteger:prefixInteger,
+	uploadPicToWxyt:uploadPicToWxyt,
+	linkUserAndFlock:linkUserAndFlock,
+	buildFlockInfoCache:buildFlockInfoCache,
+	getFlockInfoByOpenGId:getFlockInfoByOpenGId,
+}

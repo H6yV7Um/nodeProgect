@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="icon" href="static/favicon.ico" type="image/x-icon" media="screen">
+    <title>Link西安</title>
+    <link rel="stylesheet" href="/less/public.css">
+    <link rel="stylesheet" href="/less/myNear.css?v=1">
+    <script src="/js/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="/less/swiper.min.css">
+    <script src="/js/swiper.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color:#000;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden!important;
+    }
+    .swiper-container {
+        width: 100%;
+        height: 100%;
+    }
+    .swiper-slide {
+        text-align: center;
+        font-size: 18px;
+        background: #fff;
+
+        /* Center slide text vertically */
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: -webkit-flex;
+        display: flex;
+        -webkit-box-pack: center;
+        -ms-flex-pack: center;
+        -webkit-justify-content: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        -webkit-align-items: center;
+        align-items: center;
+    }
+    .swiper-slide >img{
+        width: 100%;
+    }
+    span.swiper-pagination-bullet{
+        background: #fff;
+        opacity: .4;
+    }
+    span.swiper-pagination-bullet.swiper-pagination-bullet-active{
+        opacity: 1;
+        background: #fff;
+    }
+    .banner{
+        width:100%;
+        height:276px;
+        overflow: hidden;
+    }
+    .banner img{
+        height:276px;
+    }
+    .single-sort a {
+            display: inline-block;
+            width: 100%;
+            height: 80px;
+           position: relative;
+        }
+
+    .single-sort a img{
+        width: 70%;
+        position:absolute;
+        left: 0;
+        right: 0;
+        top:0;
+        bottom: 0;
+        margin: auto;
+    }
+    .single-text{
+        text-align: center;
+    }
+    .swiper-container-horizontal>.swiper-pagination-bullets, .swiper-pagination-custom, .swiper-pagination-fraction{
+        bottom: 7%;
+    }
+    .swiper-slide{
+        overflow: hidden;
+    }
+    .swiper-slide >img{
+        width: auto;
+    }
+    .myNear .shop-list-area .single-shop .shop-info .shop-lower-cnt span{
+        white-space:normal;
+        line-height: 1.3em;
+    }
+</style>
+<body>
+<div class="myNear">
+    <div class="search-top">
+        <form action="/favourable_search" method="post">
+          <input type="text" name= 'content' placeholder="搜索您想要的店铺" class="search-input" required>
+          <button type="submit" class="search-btn">确定</button>
+        </form>
+    </div>
+    <div class="banner">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <% for x in @banner : %>
+                    <a href="<%= x.ad_url %>">
+                       <div class="swiper-slide" style="height: 100%"><img src="<%= x.pic_url %>" alt=""></div>
+                    </a>
+                <% end %>
+            </div>
+            <!-- Add Pagination -->
+            <div class="swiper-pagination"></div>
+            <!-- Add Arrows -->
+        </div>
+    </div>
+    <div class="sort-area">
+      <div class="single-sort" >
+          <a href="/favourable_typesearch/美食">
+              <img src="/imgs/nearby_meishi.png">
+          </a>
+
+        <div class="single-text">美食</div>
+      </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/美发">
+                <img src="/imgs/nearby_meifa.png">
+            </a>
+            <div class="single-text">美发</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/鲜花">
+                <img src="/imgs/nearby_xianhua.png">
+            </a>
+            <div class="single-text">鲜花</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/蛋糕">
+                <img src="/imgs/nearby_dangao.png">
+            </a>
+            <div class="single-text">蛋糕</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/爱车">
+                <img src="/imgs/nearby_aiche.png">
+            </a>
+            <div class="single-text">爱车</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/酒店">
+                <img src="/imgs/nearby_jiudian.png">
+            </a>
+            <div class="single-text">酒店</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/水果">
+                <img src="/imgs/nearby_shuiguo.png">
+            </a>
+            <div class="single-text">水果</div>
+        </div>
+        <div class="single-sort" >
+            <a href="/favourable_typesearch/全部">
+                <img src="/imgs/nearby_whole.png">
+            </a>
+            <div class="single-text">全部</div>
+        </div>
+    </div>
+    <div class="shop-list-area">
+        <% for x in @shop : %>
+            <div class="single-shop">
+                <div class="img-area">
+                    <img src="<%= x.picurl %>">
+                </div>
+                <div class="shop-info">
+                    <div class="shop-title"><%= x.shopname %></div>
+                    <div class="shop-lower-cnt">
+                        <span><img src="/imgs/nearby_youhui.png"><%= x.benefit %></span>
+                    </div>
+                    <div class="shop-address">
+                        <span><img src="/imgs/nearby_dizhi.png"><%= x.address %></span>
+                    </div>
+                    <div class="shop-tel">
+                        <span><img src="/imgs/nearby_dianhua.png"><%= x.phone %></span>
+                    </div>
+                </div>
+            </div>
+        <% end %>
+    </div>
+  </div>
+</body>
+</html>
+<script>
+$(function () {
+    var swiper = new Swiper('.swiper-container', {
+        spaceBetween: 30,
+        centeredSlides: true,
+        autoplay: {
+            delay: 2500,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+    });
+})
+</script>

@@ -1,0 +1,88 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "tencentyun",
+        "scope": null,
+        "escapedName": "tencentyun",
+        "name": "tencentyun",
+        "rawSpec": "",
+        "spec": "latest",
+        "type": "tag"
+      },
+      "/data/www/quntuji"
+    ]
+  ],
+  "_from": "tencentyun@latest",
+  "_id": "tencentyun@2.0.4",
+  "_inCache": true,
+  "_location": "/tencentyun",
+  "_nodeVersion": "0.10.36",
+  "_npmUser": {
+    "name": "knuthfan",
+    "email": "jayli@outlook.com"
+  },
+  "_npmVersion": "2.9.1",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "tencentyun",
+    "scope": null,
+    "escapedName": "tencentyun",
+    "name": "tencentyun",
+    "rawSpec": "",
+    "spec": "latest",
+    "type": "tag"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/tencentyun/-/tencentyun-2.0.4.tgz",
+  "_shasum": "0f4bba8d83562550ac915f3c760cf7165f01a9e2",
+  "_shrinkwrap": null,
+  "_spec": "tencentyun",
+  "_where": "/data/www/quntuji",
+  "author": {
+    "name": "tencentyun"
+  },
+  "bugs": {
+    "url": "https://github.com/tencentyun/nodejs-sdk/issues"
+  },
+  "dependencies": {
+    "formstream": "0.0.7"
+  },
+  "description": "node sdk for qcloud ",
+  "devDependencies": {},
+  "directories": {},
+  "dist": {
+    "shasum": "0f4bba8d83562550ac915f3c760cf7165f01a9e2",
+    "tarball": "https://registry.npmjs.org/tencentyun/-/tencentyun-2.0.4.tgz"
+  },
+  "engines": [
+    "node >= 0.4.7"
+  ],
+  "gitHead": "b529bec378186cc3132cf1f51fdc1d74f7257d54",
+  "homepage": "https://github.com/tencentyun/nodejs-sdk#readme",
+  "keywords": [
+    "qcloud"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "maintainers": [
+    {
+      "name": "knuthfan",
+      "email": "jayli@outlook.com"
+    }
+  ],
+  "name": "tencentyun",
+  "optionalDependencies": {},
+  "readme": "ERROR: No README data found!",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tencentyun/nodejs-sdk.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "2.0.4"
+}

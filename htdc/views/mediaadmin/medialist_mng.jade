@@ -1,0 +1,143 @@
+extends ../layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    link(type='text/css',href="/js/nestable/jquery.nestable.css",rel="stylesheet")
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+        .mylist {
+            display: block;
+            height: 30px;
+            margin: 5px 0;
+            padding: 5px 10px;
+            cursor: move;
+            color: #333;
+            text-decoration: none;
+            font-weight: bold;
+            border: 1px solid #ccc;
+            background: #F5F5F5;
+            /* background: -webkit-linear-gradient(top, #fafafa 0%, #eee 100%); */
+            box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+
+
+
+block content
+
+    .row
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 所有分类
+                .panel-body
+                    #nestable_list_1.dd
+                        ol.dd-list
+                            each x in data
+                                li.dd-item(data-id="2")
+                                    .mylist
+                                        img(src='#{x.picLogo}',style='width:20px;height:20px;margin-right:10px')
+                                        span #{x.content}
+
+                                        a(href = "/mediaadmin/editclass/#{x._id}",class="btn btn-info btn-xs",style="float:right;") 编辑
+                                        a(href="#myModal{{$index}}",data-toggle="modal",class="btn btn-warning btn-xs",onclick='sms()') 删除
+                                        .modal.fade(aria-hidden='true', aria-labelledby='myModalLabel', role='dialog', tabindex='-1',id="myModal{{$index}}")
+                                            .modal-dialog
+                                                .modal-content
+                                                    .form
+                                                        form#commentForm.cmxform.form-horizontal.adminex-form(method='post',  action='/mediaadmin/deleteclass')
+                                                            .modal-header
+                                                                button.close(aria-hidden='true', data-dismiss='modal', type='button') ×
+                                                                h4.modal-title 确认删除？
+                                                            .modal-body
+                                                                //弹出框内容部分
+                                                                .rejectContent
+                                                                    input#useraccount.form-control(name='interspaceId',  type='hidden', value='#{x._id}')
+                                                            .modal-footer
+                                                                button.btn.btn-default(type='button', data-dismiss='modal') 取消
+                                                                button#confirm.btn.btn-warning(type='submit' class="okReject")  确定
+                                    ol.dd-list
+                                        each server in x.servers
+                                            li.dd-item(data-id="3")
+                                                .mylist
+                                                    span #{server.content}
+
+                                                    a(href = "/mediaadmin/edittype/#{server._id}",class="btn btn-success btn-xs",style="float:right;") 编辑
+                                                    a(href = "/mediaadmin/deletetype/#{server._id}",class="btn btn-warning btn-xs",style="float:right;") 删除
+
+block myScript
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='/js/nestable/jquery.nestable.js')
+    script(src='/js/nestable-init.js')
+    //script(src='/js/scripts.js')
+    script(src='/js/bootstrap.min.js')
+    script(src='/js/modernizr.min.js')
+    script(src='/js/jquery.nicescroll.js')
+    script(src='/js/myJs/page.js')
+    script(type='text/javascript').
+
+
+

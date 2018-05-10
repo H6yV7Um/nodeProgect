@@ -1,0 +1,1062 @@
+extends ./layout
+block myCss
+    link(type='text/css',href="/css/myCss/mask.css",rel="stylesheet")
+    link(rel='stylesheet', type='text/css', href='/js/wangEditor/dist/css/wangEditor.min.css')
+    style(type='text/css').
+        #wrapper {
+            min-height: 700px;
+        }
+
+        .nav a {
+            cursor: pointer
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle !important;
+        }
+
+        td.width350{
+            width: 15%;
+            font-size: 12px;
+            text-align: left;
+            color: #999999;
+        }
+
+        img.smallImg {
+            width: 76px;
+            height: 76px;
+        }
+
+        img.autoImg {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        a.lookBackImgBtn, a.lookImgtextBtn {
+            margin-top: 5px;
+        }
+
+        button.goOnBtn {
+            margin: 10px 0;
+        }
+
+        input.leftTra {
+            float: left;
+        }
+        .modal-body{
+            overflow: hidden;
+        }
+
+        td img {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+        }
+
+
+
+
+block title
+    title 创程管理后台
+
+block administratorName1
+    a(href='#') 管理员
+
+block administratorName2
+    a.btn.btn-default.dropdown-toggle(href='#', data-toggle='dropdown')
+        | #{userinfo.account}
+
+block leftNav
+    | !{leftNav}
+
+block content
+    .row(ng-app="goodsAdd" ng-controller="goodsAddCtrl")
+        .col-lg-12
+            section.panel
+                header.panel-heading
+                    | 数据统计
+                .panel-body
+                    .form
+                        .form-group
+                            label.control-label.col-lg-2(for='ctype') 选择类型
+                            .col-lg-3
+                                select#utype1.form-control(name="utype1",required="")
+                                    option(value="1") 每日
+                                    option(value="2") 每周
+                                    option(value="3") 每月
+                            .col-lg-3
+                                select#utype2.form-control(name="utype2",required="")
+                                    option(value="1") 总人数
+                                    option(value="2") 注册人数
+                        .form-group
+                            #data2(data-data="#{data2}",style="dispaly:none")
+                            .col-lg-11.col-sm-11
+                                #container2(style="height:500px;margin:40px 0")
+                        .form-group
+                            label.control-label.col-lg-2(for='ctype') 选择类型
+                            .col-lg-3
+                                select#ctype.form-control(name="ctype",required="")
+                                    option(value="1") 每日
+                                    option(value="2") 每周
+                                    option(value="3") 每月
+                        .form-group
+                            #data1(data-data="#{data1}",style="dispaly:none")
+                            .col-lg-11.col-sm-11
+                                #container1(style="height:500px;margin:40px 0")
+                        .form-group
+                            label.control-label.col-lg-2(for='ctype') 选择类型
+                            .col-lg-3
+                                select#ptype1.form-control(name="ptype1",required="")
+                                    option(value="1") 每日
+                                    option(value="2") 每周
+                                    option(value="3") 每月
+                            .col-lg-3
+                                select#ptype2.form-control(name="ptype2",required="")
+                                    option(value="1") 个人中心
+                                    option(value="2") 服务
+                                    option(value="3") 首页
+                                    option(value="4") 大程帮
+                        .form-group
+                            #data3(data-data="#{data3}",style="dispaly:none")
+                            .col-lg-11.col-sm-11
+                                #container3(style="height:500px;margin:40px 0")
+
+block myScript
+    script(type='text/javascript', src='/js/jquery.validate.min.js')
+    //script(src='/js/validation-init.js')
+    //script(src='/js/jquery.validate.messages_zh.js')
+    script(type='text/javascript', src='/js/wangEditor/dist/js/wangEditor.min.js')
+    script(src='/js/jquery.validate.kuku.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.iframe-transport.js')
+    script(src='/js/jQuery-File-Upload-9.12.5/js/jquery.fileupload.js')
+    script(src='/js/angular-1.5.8/angular.min.js')
+    script(src='http://cdn.hcharts.cn/highcharts/highcharts.js')
+    script(src='http://cdn.hcharts.cn/highcharts/highcharts-more.js')
+    //script(src='/js/jquery-1.10.2.min.js')
+    script(type='text/javascript').
+
+        var data1 = JSON.parse($("#data1").attr("data-data"))
+        $('#container1').highcharts({
+            title: {
+                text: '大程帮动态发布统计图'
+            },
+            xAxis: {
+                categories: data1[0][0]
+            },
+            yAxis: {
+                title: {
+                    text: '个数'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                allowDecimals: false
+
+            },
+            tooltip: {
+                valueSuffix: '个'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: '个数',
+                data: data1[0][1]
+            }],
+            credits: {
+                enabled: false
+            }
+        })
+        $('#ctype').change(function () {
+            var ctype=$('#ctype').val()
+            if(ctype == "1"){
+                $('#container1').highcharts({
+                    title: {
+                        text: '大程帮动态发布统计图'
+                    },
+                    xAxis: {
+                        categories: data1[0][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '个数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '个'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '个数',
+                        data: data1[0][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                })
+            }
+            if(ctype == "2"){
+                $('#container1').highcharts({
+                    title: {
+                        text: '大程帮动态发布统计图'
+                    },
+                    xAxis: {
+                        categories: data1[1][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '个数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '个'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '个数',
+                        data: data1[1][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                })
+            }
+            if(ctype == "3"){
+                $('#container1').highcharts({
+                    title: {
+                        text: '大程帮动态发布统计图'
+                    },
+                    xAxis: {
+                        categories: data1[2][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '个数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '个'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '个数',
+                        data: data1[2][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                })
+            }
+        })
+        var data2 = JSON.parse($("#data2").attr("data-data"))
+        $('#container2').highcharts({
+            title: {
+                text: '用户统计图'
+            },
+            xAxis: {
+                categories: data2[0][0]
+            },
+            yAxis: {
+                title: {
+                    text: '人数'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                allowDecimals: false
+
+            },
+            tooltip: {
+                valueSuffix: '人'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: '人数',
+                data: data2[0][1]
+            }],
+            credits: {
+                enabled: false
+            }
+        });
+        $('#utype1').change(utypechange)
+        $('#utype2').change(utypechange)
+        function utypechange() {
+            var utype1 = $('#utype1').val()
+            var utype2 = $('#utype2').val()
+            if (utype1 == "1" && utype2 == "1") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[0][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[0][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (utype1 == "2" && utype2 == "1") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[1][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[1][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (utype1 == "3" && utype2 == "1") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[2][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[2][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (utype1 == "1" && utype2 == "2") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[3][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[3][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (utype1 == "2" && utype2 == "2") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[4][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[4][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (utype1 == "3" && utype2 == "2") {
+                $('#container2').highcharts({
+                    title: {
+                        text: '用户统计图'
+                    },
+                    xAxis: {
+                        categories: data2[5][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '人数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '人'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '人数',
+                        data: data2[5][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        }
+        var data3 = JSON.parse($("#data3").attr("data-data"))
+        $('#container3').highcharts({
+            title: {
+                text: '访问页面统计图'
+            },
+            xAxis: {
+                categories: data3[0][0]
+            },
+            yAxis: {
+                title: {
+                    text: '次数'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }],
+                allowDecimals: false
+
+            },
+            tooltip: {
+                valueSuffix: '次'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: '次数',
+                data: data3[0][1]
+            }],
+            credits: {
+                enabled: false
+            }
+        });
+        $('#ptype1').change(ptypechange)
+        $('#ptype2').change(ptypechange)
+        function ptypechange() {
+            var ptype1 = $('#ptype1').val()
+            var ptype2 = $('#ptype2').val()
+            if (ptype1 == "1" && ptype2 == "1") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[0][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[0][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "2" && ptype2 == "1") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[1][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[1][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "3" && ptype2 == "1") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[2][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[2][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "1" && ptype2 == "2") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[3][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[3][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "2" && ptype2 == "2") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[4][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[4][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "3" && ptype2 == "2") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[5][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[5][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "1" && ptype2 == "3") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[6][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[6][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "2" && ptype2 == "3") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[7][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[7][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "3" && ptype2 == "3") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[8][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[8][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "1" && ptype2 == "4") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[9][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[9][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "2" && ptype2 == "4") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[10][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[10][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+            if (ptype1 == "3" && ptype2 == "4") {
+                $('#container3').highcharts({
+                    title: {
+                        text: '访问页面统计图'
+                    },
+                    xAxis: {
+                        categories: data3[11][0]
+                    },
+                    yAxis: {
+                        title: {
+                            text: '次数'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }],
+                        allowDecimals: false
+
+                    },
+                    tooltip: {
+                        valueSuffix: '次'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [{
+                        name: '次数',
+                        data: data3[11][1]
+                    }],
+                    credits: {
+                        enabled: false
+                    }
+                });
+            }
+        }

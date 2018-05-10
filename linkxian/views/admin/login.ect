@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="icon" href="/imgs/favicon.ico" type="image/x-icon" media="screen">
+    <title>Link西安</title>
+    <link rel="stylesheet" href="/less/public.css">
+    <link rel="stylesheet" href="/less/nearby.css">
+    <script src="/js/jquery-1.8.3.min.js"></script>
+</head>
+<style>
+    .input-area.login-area{
+        position: relative;
+        bottom: 45px;
+        background-color: #fff;
+        width: 50%;
+        margin-left: 25%;
+        padding: 20px 0;
+        -webkit-box-shadow: 0 0 5px #ddd;
+        box-shadow: 0 0 5px #ddd;
+    }
+</style>
+<body>
+<div class="nearby">
+    <div class="displace-top-cnt"></div>
+    <div class="input-area login-area">
+        <div class="input-title" style="text-align: center">登录</div>
+
+        <div class="single-input">
+            <label for="userName">
+                <span class="mustItem">用户名</span>
+                <input type="text" placeholder="填写用户名" id="userName">
+            </label>
+        </div>
+        <div class="single-input">
+            <label for="pass">
+                <span class="mustItem">密码</span>
+                <input type="password" placeholder="填写密码" id="pass">
+            </label>
+        </div>
+        <div class="form-tip">
+            <span>＊</span>为必填项
+        </div>
+        <button class="sub-btn singUp">提交</button>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    $(".singUp").click(function () {
+        var userName = $("#userName").val();
+        var pass = $("#pass").val();
+        if(userName.trim()==''||pass.trim()==''){
+            alert('请填写输入框的内容')
+            return false;
+        }
+
+        $.post("/admin/login", {
+            userName:userName,
+            pass:pass
+        }, function (data) {
+            if (data.error == '0') {
+//                alert('222')
+                location.href = '/admin/examine';
+            }else if (data.error == '10002'){
+                alert('密码错误!');
+            }else if (data.error == '10001'){
+                alert('用户名不存在!');
+            }else if (data.error == '3'){
+                alert('数据库错误!');
+            }
+        })
+        return false;
+    })
+</script>

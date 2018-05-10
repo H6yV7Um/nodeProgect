@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+    <meta name="apple-mobile-web-app-capable" content="no"/>
+    <meta name="format-detection" content="telephone=no,email=no,adress=no"/>
+    <title>康培</title>
+    <link rel="stylesheet" type="text/css" href="../css/bootstrap.css"/>
+    <link href="../css/video-js.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../css/kp.css"/>
+    <script src="js/jquery-1.10.2.min.js"></script>
+
+</head>
+
+<body>
+<div class="home">
+    <div class="headerLeft">
+        <img class="logo1" class="img-responsive" src="../images/LOGO.png"/>
+        <img class="logo2" src="../images/uuu.png"/>
+    </div>
+    <div class="headerRight">
+        <p>2018“型”中国购票</p>
+        <span class="fontLeft">电子音乐节</span><span class="fontRight">健美健身大奖赛</span>
+
+    </div>
+    <div class="xian">
+        <img class="" src="../images/2.png"/>
+				<span id="">
+					西安绿地笔克国际展馆
+				</span>
+    </div>
+    <div class="videos">
+        <video id="my-video" class="video-js  vjs-big-play-centered" controls preload="auto"
+               poster="../images/videoimg.png" data-setup="{}">
+            <source src="http://jq22com.qiniudn.com/jq22-sp.mp4" type="video/mp4">
+            <p class="vjs-no-js">
+                To view this video please enable JavaScript, and consider upgrading to a web browser that
+                <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+            </p>
+        </video>
+
+    </div>
+    <p class="introduce">2018“型”中国电子音乐节健美健身大奖赛是基于现代音乐节与形体赛事为一体的大型文化娱乐活动，经<span>国家健美健身协会</span>（CBBA）授权予以承办。</p>
+    <div class="introduce1">
+        <div class="left">
+            中国健美协会是中国健美健身运动的管理机构，是亚洲健身健美联合会及国际健美联合会的团体会员。
+        </div>
+        <div class="right">
+            <img src="../images/VCG2132164e176.png"/>
+        </div>
+
+    </div>
+    <p class="introduce">中国健美协会是<span>中国奥委会</span>承认的代表中国参加亚洲健身健美联合会和国际健美联合会的唯一合法组织。</p>
+    <div class="photo">
+        <img src="../images/111.png"/>
+
+    </div>
+    <p class="introduce">赛事邀约百大DJ贴合WBFF世界健美健身先生、小姐大赛体育与音乐完美结合明星达人们亲身分享。 </p>
+    <div class="music">
+        <img class="goshops" src="../images/music.png"/>
+    </div>
+    <div class="introduce1">
+        <div class="left">
+            国内神秘一线明星助阵；世界排名前<span style="color: #E518F7;font-size: 25px;">30</span>大DJ.
+        </div>
+        <div class="right">
+            <img src="../images/emil-vilsek-393710-unsplash.png"/>
+        </div>
+
+    </div>
+    <p class="introduce goshop">全名健康带动经济展现国家实力,响应国家全民健身号召, 转播体育及文化,增强幸福指数, 时尚健身,展现中国形体力量。</p>
+    <div class="shop">
+        <img  id="pay" src="../images/6.png"/>
+    </div>
+    <div class="kp">
+        <img class="kp1" src="../images/3.png"/>
+        <img class="kp2" src="../images/kplogo.png"/>
+    </div>
+    <div class="address">
+        <div class="address1">
+            <p> 承办：西安康陪软件科技有限公司 </p>
+            <p> 地址：西安市碑林区创新设计大楼A9 </p>
+            <p> 电话：13152320420</p>
+        </div>
+
+    </div>
+    <input type="hidden" id="codeType" value="<%- @type %>">
+
+</div>
+
+</body>
+<script src="../js/video.min.js"></script>
+<script type="text/javascript">
+$(function(){
+
+    var codeType=$('#codeType').val()
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+if(codeType=='WeiXIN'){
+    var access_code=getQueryString('code');
+    if(!access_code){
+        location.href='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx36bad35da6f6f2d5&redirect_uri=http%3a%2f%2fkp.mengotech.com&response_type=code&scope=snsapi_base&state=123#wechat_redirect'
+        access_code=getQueryString('code')
+    }
+    $('#pay').click(function () {
+        $.post('/wxpay',{accessCode:access_code},  function (data) {
+            if(data.error=='0'){
+                WeixinJSBridge.invoke(
+                        'getBrandWCPayRequest', {
+                            appId: 'wx36bad35da6f6f2d5',
+                            timeStamp: data.data.timeStamp,
+                            nonceStr: data.data.nonceStr,
+                            package: data.data.package,
+                            signType: 'MD5',
+                            paySign: data.data.paySign,
+                        },
+                        function (res) {
+                            if (res.err_msg == "get_brand_wcpay_request:ok") {
+                            }     // 使用以上方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。
+                        }
+                );
+            }
+
+            if(data.error=='20002'){
+                alert('票已售完')
+            }
+        })
+    })
+}else if(codeType=='Alipay'){
+    $('#pay').click(function () {
+        $.post('/pay',{
+        },function (data) {
+            if(data.code==0){
+                location.href=data.data
+            }
+
+            if(data.error=='20002'){
+                alert('票已售完')
+            }
+        })
+    })
+}
+
+})
+
+</script>
+
+</html>

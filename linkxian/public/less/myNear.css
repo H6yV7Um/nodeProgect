@@ -1,0 +1,156 @@
+.myNear {
+  background-color: #f8f8f8;
+}
+.myNear .search-top {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0 2.5%;
+  background-color: #fff;
+  height: 50px;
+  line-height: 50px;
+  text-align: left;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 111;
+}
+.myNear .search-top .search-input {
+  background-color: #d7d7d7;
+  border: none;
+  outline: none;
+  width: 63%;
+  text-align: center;
+  height: 30px;
+  border-radius: 5px;
+  padding: 0 5%;
+  float: left;
+  margin-top: 10px;
+}
+.myNear .search-top .search-btn {
+  width: 25%;
+  float: right;
+  background-color: #fb9077;
+  color: #fff;
+  border: none;
+  outline: none;
+  height: 30px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+.myNear .swiper-cnt {
+  height: 180px;
+}
+.myNear .swiper-cnt img {
+  width: 100%;
+  height: 180px;
+}
+.myNear .swiper-cnt .wc-pagination .wc-dot {
+  z-index: 10;
+  background-color: #97908b;
+}
+.myNear .swiper-cnt .wc-pagination .wc-dot-active {
+  background-color: #fb9077;
+}
+.myNear .sort-area {
+  padding: 10px 2.5%;
+  background-color: #fff;
+}
+.myNear .sort-area .single-sort {
+  float: left;
+  width: 25%;
+}
+.myNear .sort-area .single-sort img {
+  width: 55%;
+}
+.myNear .sort-area .single-sort .single-text {
+  font-size: 12px;
+}
+.myNear .sort-area:after {
+  content: "";
+  clear: both;
+  display: block;
+}
+.myNear .shop-list-area {
+  margin-top: 20px;
+  padding: 0 2.5%;
+  background-color: #fff;
+}
+.myNear .shop-list-area .single-shop {
+  padding: 10px 0;
+  border-bottom: 1px solid #d7d7d7;
+}
+.myNear .shop-list-area .single-shop .img-area {
+  width: 45%;
+  float: left;
+}
+.myNear .shop-list-area .single-shop .img-area img {
+  width: 90%;
+  height: 105px;
+}
+.myNear .shop-list-area .single-shop .shop-info {
+  width: 50%;
+  float: left;
+  text-align: left;
+  font-size: 16px;
+  padding-left: 3%;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-title {
+  color: #333;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-lower-cnt {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #909090;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-lower-cnt span {
+  max-width: 100%;
+  max-height: 37px;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-lower-cnt span img {
+  width: 15px;
+  position: relative;
+  top: 3px;
+  margin-right: 5px;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-address {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #909090;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-address span {
+  display: inline-block;
+  max-width: 95%;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-address span img {
+  width: 15px;
+  position: relative;
+  top: 3px;
+  margin-right: 5px;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-tel {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #909090;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-tel span {
+  display: inline-block;
+  max-width: 95%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.myNear .shop-list-area .single-shop .shop-info .shop-tel span img {
+  width: 15px;
+  position: relative;
+  top: 2px;
+  margin-right: 5px;
+}
+.myNear .shop-list-area .single-shop:after {
+  clear: both;
+  content: "";
+  display: block;
+}
